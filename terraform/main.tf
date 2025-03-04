@@ -10,7 +10,7 @@ terraform {
     organization = "orga_vis"
 
     workspaces {
-      name = "snowflake_project_workspace"
+      name = "workspace_bis"
     }
   }
 }
