@@ -23,8 +23,8 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          github-token: ${{ secrets.GIT_TF_TOKEN }}
+       # with:
+        #  github-token: ${{ secrets.GIT_TF_TOKEN }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -38,8 +38,8 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
 
       - name: set test vars and select workspace
         id: testvar
-        if: github.event_name == 'pull_request'
-        run: cp ../vars/test.auto.tfvars var.auto.tfvars && terraform workspace select test
+        if: github.event_name == 'push'
+        run: cp ../vars/test.auto.tfvars var.auto.tfvars && terraform workspace select workspace_bis
 
       - name: Terraform Init
         id: init
