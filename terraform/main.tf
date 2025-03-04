@@ -7,10 +7,10 @@ terraform {
   }
 
   backend "remote" {
-    organization = "orga"
+    organization = "orga_vis"
 
     workspaces {
-      prefix = "snowflake-project-"
+      name = "snowflake_project_workspace"
     }
   }
 }

@@ -1,16 +1,22 @@
 name: "CI"
 
+#configures the pipeline to automatically run when a change is pushed on the
+#main branch of the repository.
 on:
-  pull_request:
+  #pull_request:
+  push:
+    branches:
+      - main
   
 permissions:
   issues: write
   pull-requests: write
-  
-jobs:
+
+# https://docs.github.com/en/actions/about-github-actions/understanding-github-actions
+jobs: # Job: set of steps in workflow executed on same runner (shell script, or an action)
   snowflake-terraform-plan:
     name: "Snowflake Terraform Job"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest #Runner: server that runs workflows when triggered. Can run single job at a time.
     defaults:
         run:
             working-directory: terraform
