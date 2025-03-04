@@ -1,2 +1,2 @@
-environment    = "TEST"
+environment    = "QUAL"
 warehouse_size = "small"
