@@ -35,15 +35,16 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
    #   - name: Terraform Format
     #    id: fmt
      #   run: terraform fmt -check
+      - name: Terraform Init
+        id: init
+        run: terraform init
 
       - name: set test vars and select workspace
         id: testvar
         if: github.event_name == 'push'
         run: cp ../vars/qual.auto.tfvars var.auto.tfvars &&  terraform workspace list && terraform workspace select qual
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
+
 
 
       - name: Terraform Validate
