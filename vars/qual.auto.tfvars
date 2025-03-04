@@ -1,2 +1,2 @@
-environment    = "QUAL"
+environment    = "qual"
 warehouse_size = "small"

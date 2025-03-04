@@ -1,2 +1,2 @@
-environment    = "DEV"
+environment    = "dev"
 warehouse_size = "x-small"
