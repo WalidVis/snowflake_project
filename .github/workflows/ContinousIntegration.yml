@@ -55,7 +55,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
 
 
       - uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request' or github.event_name == 'push'
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         env:
           PLAN: "terraform\n${{ steps.test_plan.outputs.stdout }}"
         with:
