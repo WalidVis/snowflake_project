@@ -16,10 +16,6 @@ terraform {
 }
 
 provider "snowflake" {
-    organization_name = "viseo.com"
-    account_name      = "Viseo_admin"
-    user              = "VISEO"
-    password          = "TESTTESTtest123"
-    role              = "ACCOUNTADMIN"
+
 
 }
