@@ -42,7 +42,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
       - name: set test vars and select workspace
         id: testvar
         if: github.event_name == 'push'
-        run: cp ../vars/qual.auto.tfvars var.auto.tfvars && terraform workspace select snowflake_project_workspace_qual
+        run: cp ../vars/qual.auto.tfvars var.auto.tfvars &&  terraform workspace list &&terraform workspace select snowflake_project_workspace_qual
 
 
       
