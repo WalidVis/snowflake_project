@@ -6,7 +6,7 @@ terraform {
     }
   }
 
-  backend "remote" {
+   cloud { 
     organization = "orga_vis"
 
     workspaces {
