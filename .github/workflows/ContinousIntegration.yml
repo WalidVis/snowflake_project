@@ -30,7 +30,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.11.0"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN_BIS }}
 
    #   - name: Terraform Format
     #    id: fmt
