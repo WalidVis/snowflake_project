@@ -3,7 +3,9 @@ terraform {
   required_providers {
     snowflake = { #local name module
       source  = "Snowflake-Labs/snowflake" #(NAMESPACE/TYPE for terraform registry)
-      version = "~> 0.87" #version constraint(provider versions module is compatible with)
+      #version constraint(provider versions module is compatible with)
+      # https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest
+      version = "~> 0.87"
     }
   }
 
