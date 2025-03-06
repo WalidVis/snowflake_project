@@ -25,6 +25,6 @@ terraform {
 }
 
 provider "snowflake" {
-
+ 
 
 }

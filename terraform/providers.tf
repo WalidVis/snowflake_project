@@ -1,6 +1,7 @@
 provider "snowflake" {
   alias = "security_admin"
   role  = "SECURITYADMIN"
+//   profile  = "securityadmin"
 }
 
 provider "snowflake" {

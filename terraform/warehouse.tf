@@ -8,7 +8,7 @@ resource "snowflake_warehouse" "warehouse" {
 resource "snowflake_grant_privileges_to_account_role" "warehouse_grant" {
   privileges        = ["USAGE"]
   provider          = snowflake.sys_admin
-  account_role_name = snowflake_role.role.name
+  account_role_name = snowflake_account_role.role.name
   on_account_object {
     object_type = "WAREHOUSE"
     object_name = snowflake_warehouse.warehouse.name
