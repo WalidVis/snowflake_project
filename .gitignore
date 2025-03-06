@@ -2,3 +2,5 @@ target/
 .idea/
 wget-log
 .terraform
+terraform/.terraform.lock.hcl
+terraform/test.auto.tfvars
