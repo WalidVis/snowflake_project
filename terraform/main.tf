@@ -5,7 +5,7 @@ terraform {
       source  = "Snowflake-Labs/snowflake" #(NAMESPACE/TYPE for terraform registry)
       #version constraint(provider versions module is compatible with)
       # https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest
-      version = "~> 0.87"
+      version = "1.0.4"
     }
   }
 
@@ -25,6 +25,6 @@ terraform {
 }
 
 provider "snowflake" {
-
+ 
 
 }
