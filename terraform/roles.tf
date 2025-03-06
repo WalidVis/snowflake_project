@@ -1,6 +1,7 @@
 resource "snowflake_account_role" "role" {
   provider = snowflake.security_admin
   name     = "${var.environment}_POC_VISEO_ROLE"
+  comment  = "Main role for Snowflake POC account usage"
 }
 
 resource "snowflake_grant_account_role" "rolegrant" {
