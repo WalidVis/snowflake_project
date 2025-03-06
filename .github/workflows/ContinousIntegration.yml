@@ -3,10 +3,10 @@ name: "CI"
 #configures the pipeline to automatically run when a change is pushed on the
 #main branch of the repository.
 on:
-  #pull_request:
-  push:
-    branches:
-      - main
+  pull_request:
+ # push:
+  #  branches:
+    #- main
   
 permissions:
   issues: write
@@ -29,7 +29,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.9.8"
+          terraform_version: "1.11.0"
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
    #   - name: Terraform Format
@@ -38,7 +38,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
 
       - name: set test vars and select workspace
         id: testvar
-        if: github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: cp ../vars/test.auto.tfvars var.auto.tfvars && terraform workspace select test
 
 
