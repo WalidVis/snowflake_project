@@ -1,3 +1,7 @@
+#Documentation:
+# https://github.com/marketplace/actions/hashicorp-setup-terraform
+# https://registry.terraform.io/providers/Snowflake-Labs/snowflake
+
 name: "CD"
 
 on:
