@@ -1,3 +1,7 @@
+#Documentation:
+# https://github.com/marketplace/actions/hashicorp-setup-terraform
+# https://registry.terraform.io/providers/Snowflake-Labs/snowflake
+
 name: "CI"
 
 #configures the pipeline to automatically run when a change is pushed on the
@@ -22,7 +26,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
             working-directory: terraform
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
        # with:
         #  github-token: ${{ secrets.GIT_TF_TOKEN }}
 
@@ -32,9 +36,10 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
           terraform_version: "1.11.0"
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-   #   - name: Terraform Format
-    #    id: fmt
-     #   run: terraform fmt -check
+        # To avoid bug during CI, First run "terraform fmt" on local machine plz!
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
 
       - name: Terraform Init
         id: init
@@ -44,9 +49,6 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
         id: testvar
         if: github.event_name == 'pull_request'
         run: cp ../vars/test.auto.tfvars var.auto.tfvars && terraform workspace select test
-
-
-
 
       - name: Terraform Validate
         id: validate
@@ -58,8 +60,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
         run: terraform plan -no-color
         continue-on-error: true
 
-
-      - uses: actions/github-script@0.9.0
+      - uses: actions/github-script@v7
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         env:
           PLAN: "terraform\n${{ steps.test_plan.outputs.stdout }}"
@@ -81,7 +82,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
             
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
             
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
