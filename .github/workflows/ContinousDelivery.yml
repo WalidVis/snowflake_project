@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       ENVIRONMENT:
-        description: 'Environment to deploy to (DEV, TEST, PROD !! only) (lower case)'
+        description: 'Environment to deploy to (DEV, TEST, PROD !! only) (UPPER case)'
         required: false
         default: "PROD"  # Default for manual runs without quotes
 
@@ -21,7 +21,7 @@ jobs:
             working-directory: terraform
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -29,9 +29,10 @@ jobs:
           terraform_vesion: "1.11.0"
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-  #    - name: Terraform Format
-   #     id: fmt
-    #    run: terraform fmt -check
+      # To avoid bug during CD, First run "terraform fmt" on local machine plz!
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
 
       - name: Terraform Init
         id: init
@@ -75,7 +76,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Use Python 3.8.x
         uses: actions/setup-python@v2.2.1
