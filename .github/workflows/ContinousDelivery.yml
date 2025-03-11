@@ -79,7 +79,7 @@ jobs:
     needs: snowflake-terraform-deploy
     defaults:
         run:
-            working-directory: objects_statements
+            working-directory: schemachange/objects_statements
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
