@@ -105,7 +105,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
     needs: snowflake-terraform-plan
     defaults:
         run:
-            working-directory: objects_statements
+            working-directory: schemachange
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
@@ -135,6 +135,6 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
           echo ${{ secrets.SF_ACCOUNT }}
           echo $SF_ACCOUNT
           echo "Step PR: Running schemachange DRY RUN"
-          schemachange --config-folder ../schema_change_config --connections-file-path ../schema_change_config/connection.toml  --connection-name TEST -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
+          schemachange --config-folder . --connections-file-path ./connection.toml  --connection-name TEST -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
           
  ######################################################################################################

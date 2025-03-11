@@ -62,7 +62,7 @@
 -------------------------------------------- Create stages ---------------------
 create stage if not exists RAW_LAYER.ARCHIVE_INTERNAL_STAGE;
 
-create stage if not exists  RAW_LAYER.LANDINGg_INTERNAL_STAGE;
+create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE;
 
 create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE;
 
