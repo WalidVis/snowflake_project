@@ -1,0 +1,20 @@
+[test]
+account = "SCDVOTC-GJ23748"
+user = "TerraF_User"
+database = "TEST_POC_VISEO_DB"
+role = "TEST_POC_VISEO_ROLE"
+warehouse = "TEST_WH"
+
+[dev]
+account = "SCDVOTC-GJ23748"
+user = "TerraF_User"
+database = "DEV_POC_VISEO_DB"
+role = "DEC_POC_VISEO_ROLE"
+warehouse = "DEV_WH"
+
+[prod]
+account = "SCDVOTC-GJ23748"
+user = "TerraF_User"
+database = "PROD_POC_VISEO_DB"
+role = "PROD_POC_VISEO_ROLE"
+warehouse = "PROD_WH"

@@ -3,4 +3,6 @@ target/
 wget-log
 .terraform
 terraform/.terraform.lock.hcl
+terraform/.terraform
 terraform/test.auto.tfvars
+path/to/venv
