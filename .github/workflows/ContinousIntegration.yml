@@ -135,7 +135,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
           echo ${{ secrets.SF_ACCOUNT }}
           echo $SF_ACCOUNT
           echo "Step PR: Running schemachange DRY RUN"
-          schemachange --config-folder schema_change_config --connections-file-path schema_change_config/connection.toml  --connection-name test -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
+          schemachange -v --config-folder schema_change_config --connections-file-path ../schema_change_config/connection.toml  --connection-name test -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
         #  schemachange -a ${{ secrets.SF_ACCOUNT }} -u  ${{ secrets.SF_USERNAME }} -r TEST_POC_VISEO_ROLE -w TEST_WH -d TEST_POC_VISEO_DB --vars '{"warehouse": "TEST_WH"}' -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --create-change-history-table --dry-run       
           
  ######################################################################################################
