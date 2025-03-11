@@ -10,10 +10,10 @@ create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
    \\"on_error\\": \\"SKIP_FILE\\",
    \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"}'
 as
-    BEGIN
-        LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string;
+    'BEGIN
+        LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG(''params'')::string;
 	    EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS);
-    END;
+    END';
 
     ---------------------------------------------------
     --------------------------------------------------------------------------
