@@ -62,7 +62,7 @@
 -------------------------------------------- Create stages ---------------------
 create stage if not exists RAW_LAYER.ARCHIVE_INTERNAL_STAGE;
 
-create stage if not exists  RAW_LAYER.LANDINGg_INTERNAL_STAGE;
+create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE;
 
 create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE;
 
@@ -146,3 +146,17 @@ CREATE TABLE IF NOT EXISTS SCHEMACHANGE.CHANGE_HISTORY
 
  -------------------------------------------- Create File formats ---------------------
 
+create or replace file format bronze_layer.csv_file_format 
+    TYPE = CSV 
+    PARSE_HEADER = TRUE -- Use first row for column names
+    TRIM_SPACE = TRUE -- deletes spaces outter string 
+    EMPTY_FIELD_AS_NULL = TRUE
+    FIELD_DELIMITER = ';',
+    ERROR_ON_COLUMN_COUNT_MISMATCH = FALSE -- Because loading CSV with INCLUDE_METADATA
+;
+
+create or replace file format bronze_layer.json_file_format 
+    TYPE = JSON 
+    -- NULL_IF = ('\N', 'NULL', 'NUL', '') // To convert to SQL NULL 
+    TRIM_SPACE = TRUE // deletes spaces outter white spaces 
+;
