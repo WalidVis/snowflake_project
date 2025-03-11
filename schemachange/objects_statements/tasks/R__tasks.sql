@@ -1,11 +1,10 @@
-create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
+create or replace task BRONZE_LAYER."ingest_PRC_BENCHMARK_LEVEL_csv"
 	warehouse=COMPUTE_WH
-	schedule='USING CRON 1 1 * * * Europe/Paris'
-	config='{"params": "''{ \\"src_schema\\": \\"raw_layer\\",  \\"target_table\\": \\"bronze_layer.PRC_CAMPAIGN_MARKET_BRZ\\",  \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CAMPAIGN_MARKET/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"bronze_layer.csv_file_format\\",   \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"}'
-as
-    'BEGIN
-        LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG(\'params\')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS);
-    END';
+	schedule='USING CRON 0 5 * * * Europe/Paris'
+	config='{
+  "params": "''{ \\"src_schema\\": \\"raw_layer\\",  \\"target_table\\": \\"bronze_layer.PRC_BENCHMARK_LEVEL\\",  \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_BENCHMARK_LEVEL/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"bronze_layer.csv_file_format\\", \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"
+}'
+	as BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;
 
     ---------------------------------------------------
     --------------------------------------------------------------------------
