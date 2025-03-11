@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE DEV_POC_VISEO_DB.BRONZE_LAYER.INGEST_FILE_PROC("SRC_SCHEMA" VARCHAR, "TARGET_TABLE_ABS_NAME" VARCHAR, "STAGE_NAME" VARCHAR, "STAGE_SUFFIX_DIRECTORY_PATH" VARCHAR, "PATTERN_FILE_NAME" VARCHAR, "FILE_FORMAT" VARCHAR, "ON_ERROR_OPTION" VARCHAR)
+CREATE OR REPLACE PROCEDURE BRONZE_LAYER.INGEST_FILE_PROC("SRC_SCHEMA" VARCHAR, "TARGET_TABLE_ABS_NAME" VARCHAR, "STAGE_NAME" VARCHAR, "STAGE_SUFFIX_DIRECTORY_PATH" VARCHAR, "PATTERN_FILE_NAME" VARCHAR, "FILE_FORMAT" VARCHAR, "ON_ERROR_OPTION" VARCHAR)
 RETURNS TABLE ()
 LANGUAGE SQL
 EXECUTE AS CALLER
@@ -9,7 +9,7 @@ AS 'DECLARE
     query_result RESULTSET DEFAULT (SELECT -1);
     query VARCHAR;
     layer VARCHAR(30) DEFAULT ''\\''BRONZE_LAYER\\'''';
-    monitoring_table_name VARCHAR := ''DEV_POC_VISEO_DB.monitoring_layer.monitoring_ingest'';
+    monitoring_table_name VARCHAR := ''monitoring_layer.monitoring_ingest'';
 
 BEGIN
     
@@ -35,7 +35,7 @@ BEGIN
         IF (v_status != ''LOADED'' AND v_status != ''LOAD_FAILED'' AND v_status != ''PARTIALLY_LOADED'' ) THEN
             let builded_file_name VARCHAR := stage_suffix_directory_path || pattern_file_name ;
             //copy files into :archive_file_abs_path from :landing_file_abs_path;
-            insert into DEV_POC_VISEO_DB.monitoring_layer.monitoring_ingest(file, layer, status, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', :v_status, CURRENT_TIMESTAMP(3), ''No files OR Files already loaded'');
+            insert into monitoring_layer.monitoring_ingest(file, layer, status, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', :v_status, CURRENT_TIMESTAMP(3), ''No files OR Files already loaded'');
    
             BREAK;
         END IF;
