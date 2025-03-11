@@ -108,8 +108,8 @@ jobs:
         run: |
           echo "Running schemachange TO EXEC"
           if [[ "${{ github.ref }}" == "refs/heads/main" && ${{ github.event_name }} == 'push' ]]; then
-            schemachange deploy -f . -a ${{ secrets.SF_ACCOUNT }} -u  ${{ secrets.SF_USERNAME }} -r TEST_POC_VISEO_ROLE -w TEST_WH -d TEST_POC_VISEO_DB --vars '{"warehouse": "TEST_WH"}' -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --create-change-history-table
+            schemachange deploy --config-folder ../schema_change_config --connections-file-path ../schema_change_config/connection.toml  --connection-name TEST -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY        
           else
-            schemachange deploy -f . -a ${{ secrets.SF_ACCOUNT }} -u  ${{ secrets.SF_USERNAME }} -r "${{ github.event.inputs.ENVIRONMENT }}"_ROLE -w "${{ github.event.inputs.ENVIRONMENT }}"_WH -d "${{ github.event.inputs.ENVIRONMENT }}"_POC_VISEO_DB --vars '{"warehouse": "${{ github.event.inputs.ENVIRONMENT }}_WH"}' -c "${{ github.event.inputs.ENVIRONMENT }}_POC_VISEO_DB".MONITORING_LAYER.CHANGE_HISTORY --create-change-history-table
+            schemachange deploy --config-folder ../schema_change_config --connections-file-path ../schema_change_config/connection.toml  --connection-name "${{ github.event.inputs.ENVIRONMENT }}" -c "${{ github.event.inputs.ENVIRONMENT }}"_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY                
           fi
 
