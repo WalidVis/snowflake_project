@@ -97,7 +97,7 @@ resource "snowflake_grant_privileges_to_account_role" "future_tables_grant" {
 resource "snowflake_schema" "monitoring_layer" {
   provider            = snowflake.sys_admin
   database            = snowflake_database.db.name
-  name                = "BRONZE_LAYER"
+  name                = "MONITORING_LAYER"
   with_managed_access = false
 }
 
