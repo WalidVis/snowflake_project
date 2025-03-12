@@ -2,6 +2,10 @@
 # https://github.com/marketplace/actions/hashicorp-setup-terraform
 # https://registry.terraform.io/providers/Snowflake-Labs/snowflake
 
+#########################
+# !!!!! Terraform workspaces (on Terraform cloud) must have the ENV part of the name (PROD, TEST, DEV) in UPPER CASE !!!!
+# (example: snowflake_project_workspace_TEST)
+
 name: "CD"
 
 on:
@@ -15,7 +19,10 @@ on:
         required: false
         default: "TEST"  # Default for manual runs without quotes
 
-  
+#########################
+# !!!!! Terraform workspaces (on Terraform cloud) must have the ENV part of the name (PROD, TEST, DEV) in UPPER CASE !!!!
+# (example: snowflake_project_workspace_TEST)
+
 jobs:
   snowflake-terraform-deploy:
     name: "Snowflake Terraform Job"
