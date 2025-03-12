@@ -2,6 +2,9 @@
 # https://github.com/marketplace/actions/hashicorp-setup-terraform
 # https://registry.terraform.io/providers/Snowflake-Labs/snowflake
 
+# !!!!! Terraform workspaces (on Terraform cloud) must have the ENV part of the name (PROD, TEST, DEV) in UPPER CASE !!!!
+# (example: snowflake_project_workspace_TEST)
+
 name: "CI"
 
 #configures the pipeline to automatically run when a change is pushed on the
@@ -17,6 +20,10 @@ permissions:
   pull-requests: write
 
 # https://docs.github.com/en/actions/about-github-actions/understanding-github-actions
+#########################
+# !!!!! Terraform workspaces (on Terraform cloud) must have the ENV part of the name (PROD, TEST, DEV) in UPPER CASE !!!!
+# (example: snowflake_project_workspace_TEST)
+
 jobs: # Job: set of steps in workflow executed on same runner (shell script, or an action)
   snowflake-terraform-plan:
     name: "Snowflake Terraform Job"

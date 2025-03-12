@@ -93,6 +93,23 @@ resource "snowflake_grant_privileges_to_account_role" "future_tables_grant" {
   }
 }
 
+
+resource "snowflake_schema" "monitoring_layer" {
+  provider            = snowflake.sys_admin
+  database            = snowflake_database.db.name
+  name                = "BRONZE_LAYER"
+  with_managed_access = false
+}
+
+resource "snowflake_grant_privileges_to_account_role" "schema_grant_monitoring" {
+  provider          = snowflake.security_admin
+  privileges        = ["USAGE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK", "CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE", "CREATE SEQUENCE"]
+  account_role_name = snowflake_account_role.role.name
+  on_schema {
+    schema_name = "\"${snowflake_database.db.name}\".\"${snowflake_schema.bronze_layer.name}\""
+  }
+}
+
 resource "snowflake_grant_privileges_to_account_role" "executetask" {
   provider          = snowflake.account_admin
   account_role_name = snowflake_account_role.role.name
