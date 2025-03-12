@@ -128,9 +128,9 @@ create or replace table MONITORING_LAYER.MONITORING_INGEST
   first_error_column_name VARCHAR(100)
 );
 
--- Not necessary to create next table "schema on change" because --create-change-history-table parameter used 
-/*
-CREATE TABLE IF NOT EXISTS SCHEMACHANGE.CHANGE_HISTORY
+-- SchemaChange history table
+
+CREATE TABLE IF NOT EXISTS MONITORING_LAYER.CHANGE_HISTORY
 (
     VERSION        VARCHAR,
     DESCRIPTION    VARCHAR,
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS SCHEMACHANGE.CHANGE_HISTORY
     INSTALLED_BY   VARCHAR,
     INSTALLED_ON   TIMESTAMP_LTZ
 )
-*/
+
 
  -------------------------------------------- Create File formats ---------------------
 

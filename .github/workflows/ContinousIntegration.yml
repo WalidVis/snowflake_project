@@ -120,7 +120,6 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
       - name: Run schemachange
         env:
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         run: |
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
@@ -130,11 +129,10 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
 
       - name: DRY RUN in case of PR
         env:
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         if: github.event_name == 'pull_request'
         run: |
-          echo ${{ secrets.SF_ACCOUNT }}
-          echo $SF_ACCOUNT
           echo "Step PR: Running schemachange DRY RUN"
           schemachange --config-folder . --connections-file-path ./connection.toml  --connection-name TEST -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
           

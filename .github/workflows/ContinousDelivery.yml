@@ -94,7 +94,6 @@ jobs:
       - name: Run schemachange
         env:
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         run: |
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
@@ -104,6 +103,7 @@ jobs:
 
       - name: EXECUTE schemachange for MERGE or MANUAL EXEC
         env:
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
         run: |
