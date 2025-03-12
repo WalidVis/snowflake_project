@@ -6,14 +6,14 @@ name: "CD"
 
 on:
   push:
-   # branches:
-   #   - main
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ENVIRONMENT:
-        description: 'Environment to deploy to (DEV, TEST, PROD !! only) (UPPER case)'
+        description: 'Environment to deploy to (dev, test, prod !! only) (LOWER case!)'
         required: false
-        default: "PROD"  # Default for manual runs without quotes
+        default: "prod"  # Default for manual runs without quotes
 
   
 jobs:
