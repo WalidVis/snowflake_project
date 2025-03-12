@@ -38,7 +38,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_vesion: "1.11.0"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }} # generated on Terraform cloud platform
 
       # To avoid bug during CD, First run "terraform fmt" on local machine plz!
       - name: Terraform Format

@@ -128,20 +128,6 @@ create or replace table MONITORING_LAYER.MONITORING_INGEST
   first_error_column_name VARCHAR(100)
 );
 
--- SchemaChange history table
-
-CREATE TABLE IF NOT EXISTS MONITORING_LAYER.CHANGE_HISTORY
-(
-    VERSION        VARCHAR,
-    DESCRIPTION    VARCHAR,
-    SCRIPT         VARCHAR,
-    SCRIPT_TYPE    VARCHAR,
-    CHECKSUM       VARCHAR,
-    EXECUTION_TIME NUMBER,
-    STATUS         VARCHAR,
-    INSTALLED_BY   VARCHAR,
-    INSTALLED_ON   TIMESTAMP_LTZ
-)
 
 
  -------------------------------------------- Create File formats ---------------------
