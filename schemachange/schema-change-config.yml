@@ -7,7 +7,7 @@ root-folder: 'objects_statements'
 modules-folder: null
 
 # Override the default connections.toml file path at snowflake.connector.constants.CONNECTIONS_FILE (OS specific)
-connections-file-path: '/home/walid/.config/snowflake/connection.toml'
+connections-file-path: './connection.toml'
 
 # Override the default connections.toml connection name. Other connection-related values will override these connection values.
 connection-name: 'viseo_poc_test_database_connection'

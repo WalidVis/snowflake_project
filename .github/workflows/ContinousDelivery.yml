@@ -73,6 +73,7 @@ jobs:
 #####################################################################################################################
   
   # https://github.com/Snowflake-Labs/schemachange
+  # https://quickstarts.snowflake.com/guide/devops_dcm_schemachange_github/#0
   
   schema-change-apply:
     runs-on: ubuntu-latest

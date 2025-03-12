@@ -99,6 +99,7 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
   #Gestion/controle des version des fichiers sql 
 
   # https://github.com/Snowflake-Labs/schemachange
+  # https://quickstarts.snowflake.com/guide/devops_dcm_schemachange_github/#0
 
   schemachange-dry-run:
     runs-on: ubuntu-latest
