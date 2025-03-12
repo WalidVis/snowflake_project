@@ -74,7 +74,7 @@ resource "snowflake_schema" "gold_layer" {
 
 resource "snowflake_grant_privileges_to_account_role" "schema_grant_gold" {
   provider          = snowflake.security_admin
-  privileges        = ["USAGE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK","CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE"]
+  privileges        = ["USAGE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK", "CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE"]
   account_role_name = snowflake_account_role.role.name
   on_schema {
     schema_name = "\"${snowflake_database.db.name}\".\"${snowflake_schema.gold_layer.name}\""
