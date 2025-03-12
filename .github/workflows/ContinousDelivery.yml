@@ -45,7 +45,7 @@ jobs:
       - name: set test vars and select workspace
         id: testvar
         if: (github.ref == 'refs/heads/main' && github.event_name == 'push')
-        run: cp ../vars/TEST.auto.tfvars var.auto.tfvars && terraform workspace select test
+        run: cp ../vars/TEST.auto.tfvars var.auto.tfvars && terraform workspace select TEST
       
       - name: set vars and workspace(manual) 
         id: customvar
