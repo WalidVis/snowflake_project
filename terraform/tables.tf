@@ -1,4 +1,5 @@
 resource "snowflake_table" "change_history_table" {
+  provider = snowflake.sys_admin
   database = snowflake_database.db.name
   schema   = snowflake_schema.monitoring_layer.name
   name     = "CHANGE_HISTORY"
