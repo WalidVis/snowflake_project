@@ -1,6 +1,6 @@
 resource "snowflake_table" "change_history_table" {
   database = snowflake_database.db.name
-  schema   = snowflake_schema.bronze_layer.name
+  schema   = snowflake_schema.monitoring_layer.name
   name     = "CHANGE_HISTORY"
   comment  = "Schemachange history table"
 
