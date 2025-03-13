@@ -102,7 +102,7 @@ resource "snowflake_schema" "monitoring_layer" {
 }
 
 resource "snowflake_grant_privileges_to_account_role" "schema_grant_monitoring" {
-  provider = snowflake.security_admin
+  provider          = snowflake.security_admin
   privileges        = ["USAGE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK", "CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE", "CREATE SEQUENCE"]
   account_role_name = snowflake_account_role.role.name
   on_schema {
