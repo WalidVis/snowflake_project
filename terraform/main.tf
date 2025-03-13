@@ -26,5 +26,5 @@ terraform {
 
 provider "snowflake" {
   preview_features_enabled = ["snowflake_table_resource"] # mandatory to use preview resource "table creation"
-
+  role                     = "SYSADMIN"
 }
