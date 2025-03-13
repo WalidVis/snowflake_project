@@ -60,16 +60,16 @@
 ------------------------------------------------------------------------------- */
 
 -------------------------------------------- Create stages ---------------------
-create stage if not exists RAW_LAYER.ARCHIVE_INTERNAL_STAGE;
+create stage if not exists RAW_LAYER.ARCHIVE_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
-create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE;
+create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
-create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE;
+create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
 create or replace stage RAW_LAYER.EXTERNAL_AZUR_STAGE
       URL = 'azure://viseomdpdevsnowflakeproj.blob.core.windows.net/source-test'
-     CREDENTIALS = ( AZURE_SAS_TOKEN = 'sp=racwdlmeop&st=2025-02-25T08:40:42Z&se=2026-04-18T15:40:42Z&spr=https&sv=2022-11-02&sr=c&sig=5Q4x2IiL71%2FhP31RYDV4ryUcsy978h1qGPnwDBied3M%3D'  );
-
+     CREDENTIALS = ( AZURE_SAS_TOKEN = 'sp=racwdlmeop&st=2025-02-25T08:40:42Z&se=2026-04-18T15:40:42Z&spr=https&sv=2022-11-02&sr=c&sig=5Q4x2IiL71%2FhP31RYDV4ryUcsy978h1qGPnwDBied3M%3D'  )
+    DIRECTORY = ( ENABLE = true );
 
 
  -------------------------------------------- Create staging BRONZE layer Tables ---------------------
