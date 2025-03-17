@@ -109,28 +109,27 @@ create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 -------------------------------------------------------------------------------------------------
 
 
-CREATE OR REPLACE TABLE SILVER_LAYER.PRC_PCS_DIM_CAMPAIGN(
-PrcPcsCampaignIntKey	NUMBER	NOT NULL,
-HouseKey	VARCHAR	NOT NULL,
-CampaignCode	VARCHAR	NOT NULL,
-CampaignName	VARCHAR,LL
-CampaignDescription	VARCHAR,
-HistoricalSellInFirstMonth	VARCHAR,
-HistoricalSellInLastMonth	VARCHAR,
-CampaignDate	DATE,
-SYS_DATE_CREATE	TIMESTAMP	NOT NULL,
-SYS_DATE_UPDATE	TIMESTAMP	NOT NULL
+CREATE OR REPLACE TABLE SILVER_LAYER.PRC_DIM_CAMPAIGN_MARKET_SLV(
+    PricingCampaignMarketPrcIntKey NUMBER NOT NULL PRIMARY KEY,
+    PricingCampaignMarketPrcKey	VARCHAR NOT NULL,
+    HouseKey VARCHAR NOT NULL,
+    CampaignCode VARCHAR NOT NULL,
+    PricingMarketCode VARCHAR NOT NULL,
+    RateType VARCHAR,
+    RateDate DATE,
+    BaseCampaignCode VARCHAR,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ
 );
 
 
 
-CREATE OR REPLACE SILVER_LAYER.PRC_DIM_CUSTOMER_ERP_PRICING_MARKET_PRC_SLV(
-PricingCustomerErpPricingMarketPrcIntKey	NUMERIC	NOT NULL PRIMARY KEY,
-PricingCustomerErpPricingMarketPrcKey	STRING	NOT NULL,
-HouseKey	STRING	NOT NULL,
-CustomerCode	STRING	NOT NULL,
-PricingMarketCode	STRING	NOT NULL,
-SYS_DATE_CREATE	TIMESTAMP	NOT NULL
+CREATE OR REPLACE SILVER_LAYER.PRC_DIM_CUSTOMER_ERP_PRICING_MARKET_SLV(
+    PricingCustomerErpPricingMarketPrcIntKey NUMBER	NOT NULL PRIMARY KEY,
+    PricingCustomerErpPricingMarketPrcKey VARCHAR NOT NULL,
+    HouseKey VARCHAR NOT NULL,
+    CustomerCode VARCHAR NOT NULL,
+    PricingMarketCode VARCHAR NOT NULL,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL
 );
 
 
