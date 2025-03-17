@@ -109,7 +109,7 @@ create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 -------------------------------------------------------------------------------------------------
 
 
-CREATE OR REPLACE TABLE SILVER_LAYER.PRC_DIM_CAMPAIGN_MARKET_SLV(
+CREATE OR REPLACE TABLE DEV_POC_VISEO_DB.SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
     PricingCampaignMarketPrcIntKey NUMBER NOT NULL PRIMARY KEY,
     PricingCampaignMarketPrcKey	VARCHAR NOT NULL,
     HouseKey VARCHAR NOT NULL,
@@ -123,7 +123,7 @@ CREATE OR REPLACE TABLE SILVER_LAYER.PRC_DIM_CAMPAIGN_MARKET_SLV(
 
 
 
-CREATE OR REPLACE SILVER_LAYER.PRC_DIM_CUSTOMER_ERP_PRICING_MARKET_SLV(
+CREATE OR REPLACE TABLE DEV_POC_VISEO_DB.SILVER_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_SLV(
     PricingCustomerErpPricingMarketPrcIntKey NUMBER	NOT NULL PRIMARY KEY,
     PricingCustomerErpPricingMarketPrcKey VARCHAR NOT NULL,
     HouseKey VARCHAR NOT NULL,
@@ -137,19 +137,28 @@ CREATE OR REPLACE SILVER_LAYER.PRC_DIM_CUSTOMER_ERP_PRICING_MARKET_SLV(
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
 
-
-CREATE OR REPLACE TABLE GOLD_LAYER.PRC_PCS_DIM_CAMPAIGN(
-PrcPcsCampaignIntKey	NUMBER	NOT NULL,
-HouseKey	STRING	NOT NULL,
-CampaignCode	STRING	NOT NULL,
-CampaignName	STRING,
-CampaignDescription	STRING,
-HistoricalSellInFirstMonth	STRING,
-HistoricalSellInLastMonth	STRING,
-CampaignDate	DATE,
-SYS_DATE_CREATE	TIMESTAMP	NOT NULL,
-SYS_DATE_UPDATE	TIMESTAMP	NOT NULL
+CREATE OR REPLACE TABLE DEV_POC_VISEO_DB.GOLD_LAYER.DIM_PRC_CAMPAIGN_MARKET_GLD(
+    PrcPcsCampaignMarketIntKey NUMBER NOT NULL PRIMARY KEY,
+    HouseKey VARCHAR NOT NULL,
+    CampaignCode VARCHAR NOT NULL,
+    PricingMarketCode VARCHAR NOT NULL,
+    RateType VARCHAR,
+    RateDate DATE,
+    BaseCampaignCode VARCHAR,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ,
+    SYS_DATE_UPDATE	TIMESTAMP_LTZ NOT NULL
 );
+
+
+CREATE OR REPLACE TABLE DEV_POC_VISEO_DB.GOLD_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_GLD(
+    PricingCustomerErpPricingMarketPrcIntKey NUMBER	NOT NULL PRIMARY KEY,
+    HouseKey VARCHAR NOT NULL,
+    CustomerCode VARCHAR NOT NULL,
+    PricingMarketCode VARCHAR NOT NULL,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
+    SYS_DATE_UPDATE	TIMESTAMP NOT NULL
+);
+
 
 
  -------------------------------------------- Create Monitoring Tables ---------------------
