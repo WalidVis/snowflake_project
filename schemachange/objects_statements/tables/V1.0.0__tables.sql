@@ -41,12 +41,6 @@
        1. Tables:
            - HUB_LOCATION
            - HUB_PRODUCT
-           - HUB_SALES
-           - SAT_LOCATION
-           - SAT_PRODUCT
-           - SAT_SALES
-           - LNK_PRODUCT_SALES
-           - LNK_LOCATION_SALES
 
         2. Streams :
            - LOCATION_OUTBOUND_STRM / PRODUCT_OUTBOUND_STRM / SALES_OUTBOUND_STRM (Keeps track of changes in STG_X tables)
@@ -55,8 +49,6 @@
            - LOCATION_STRM_TSK / PRODUCT_STRM_TSK / SALES_STRM_TSK ( Tasks to orchestrate movement from staging to raw_dtv , se basant sur les vues dans STAGING)
 
 
-
-   Author:  Walid Cheriet  -- VISEO
 ------------------------------------------------------------------------------- */
 
 -------------------------------------------- Create stages ---------------------
@@ -73,40 +65,81 @@ create or replace stage RAW_LAYER.EXTERNAL_AZUR_STAGE
 
 
  -------------------------------------------- Create staging BRONZE layer Tables ---------------------
-
+-----------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
 create or replace table BRONZE_LAYER.PRC_BENCHMARK_BRZ
 (
-  APUKCode VARCHAR(15) not null,
-  Anabench2Code VARCHAR(10),
-  Anabench2 VARCHAR(100),
-  SKUGroup VARCHAR(10),
-  SYS_SOURCE_DATE VARCHAR(50),
+  APUKCode VARCHAR not null,
+  Anabench2Code VARCHAR not null,
+  Anabench2 VARCHAR,
+  SKUGroup VARCHAR,
+  SYS_SOURCE_DATE VARCHAR,
   CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
-  file_name VARCHAR(200) -- valued with copy into command metadata
+  file_name VARCHAR -- valued with copy into command metadata
 );
 
 
 create or replace table BRONZE_LAYER.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ
 (
-  CustomerCode VARCHAR(30),
-  HouseKey VARCHAR(5),
-  PricingMarketCode VARCHAR(20),
-  SYS_SOURCE_DATE VARCHAR(50),
+  CustomerCode VARCHAR not null,
+  HouseKey VARCHAR not null,
+  PricingMarketCode VARCHAR not null,
+  SYS_SOURCE_DATE VARCHAR,
   create_date TIMESTAMP_LTZ, -- valued with copy into command metadata
-  file_name VARCHAR(200) -- valued with copy into command metadata
+  file_name VARCHAR -- valued with copy into command metadata
 );
 
 
 create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
-	PricingMarketCode VARCHAR(30),
-	CampaignCode VARCHAR(10),
-	HouseKey VARCHAR(20),
-	BaseCampaignCode VARCHAR(20),
-	RateType VARCHAR(20),
+	PricingMarketCode VARCHAR not null,
+	CampaignCode VARCHAR not null,
+	HouseKey VARCHAR not null,
+	BaseCampaignCode VARCHAR,
+	RateType VARCHAR,
 	RateDate VARCHAR,
 	SYS_SOURCE_DATE VARCHAR,
     CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
-    file_name VARCHAR(200) -- valued with copy into command metadata
+    file_name VARCHAR -- valued with copy into command metadata
+);
+
+
+
+ -------------------------------------------- Create staging SILVER layer Tables ---------------------
+-----------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+
+
+CREATE OR REPLACE TABLE GOLD_LAYER.PRC_PCS_DIM_CAMPAIGN(
+PrcPcsCampaignIntKey	NUMBER	NOT NULL,
+HouseKey	STRING	NOT NULL,
+CampaignCode	STRING	NOT NULL,
+CampaignName	STRING,
+CampaignDescription	STRING,
+HistoricalSellInFirstMonth	STRING,
+HistoricalSellInLastMonth	STRING,
+CampaignDate	DATE,
+SYS_DATE_CREATE	TIMESTAMP	NOT NULL,
+SYS_DATE_UPDATE	TIMESTAMP	NOT NULL
+);
+
+
+
+ -------------------------------------------- Create staging GOLD layer Tables ---------------------
+-----------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+
+
+CREATE OR REPLACE TABLE GOLD_LAYER.PRC_PCS_DIM_CAMPAIGN(
+PrcPcsCampaignIntKey	NUMBER	NOT NULL,
+HouseKey	STRING	NOT NULL,
+CampaignCode	STRING	NOT NULL,
+CampaignName	STRING,
+CampaignDescription	STRING,
+HistoricalSellInFirstMonth	STRING,
+HistoricalSellInLastMonth	STRING,
+CampaignDate	DATE,
+SYS_DATE_CREATE	TIMESTAMP	NOT NULL,
+SYS_DATE_UPDATE	TIMESTAMP	NOT NULL
 );
 
 
@@ -146,3 +179,5 @@ create or replace file format bronze_layer.json_file_format
     -- NULL_IF = ('\N', 'NULL', 'NUL', '') // To convert to SQL NULL 
     TRIM_SPACE = TRUE // deletes spaces outter white spaces 
 ;
+
+
