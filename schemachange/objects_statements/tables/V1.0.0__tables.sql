@@ -109,19 +109,29 @@ create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 -------------------------------------------------------------------------------------------------
 
 
-CREATE OR REPLACE TABLE GOLD_LAYER.PRC_PCS_DIM_CAMPAIGN(
+CREATE OR REPLACE TABLE SILVER_LAYER.PRC_PCS_DIM_CAMPAIGN(
 PrcPcsCampaignIntKey	NUMBER	NOT NULL,
-HouseKey	STRING	NOT NULL,
-CampaignCode	STRING	NOT NULL,
-CampaignName	STRING,
-CampaignDescription	STRING,
-HistoricalSellInFirstMonth	STRING,
-HistoricalSellInLastMonth	STRING,
+HouseKey	VARCHAR	NOT NULL,
+CampaignCode	VARCHAR	NOT NULL,
+CampaignName	VARCHAR,LL
+CampaignDescription	VARCHAR,
+HistoricalSellInFirstMonth	VARCHAR,
+HistoricalSellInLastMonth	VARCHAR,
 CampaignDate	DATE,
 SYS_DATE_CREATE	TIMESTAMP	NOT NULL,
 SYS_DATE_UPDATE	TIMESTAMP	NOT NULL
 );
 
+
+
+CREATE OR REPLACE SILVER_LAYER.PRC_DIM_CUSTOMER_ERP_PRICING_MARKET_PRC_SLV(
+PricingCustomerErpPricingMarketPrcIntKey	NUMERIC	NOT NULL,
+PricingCustomerErpPricingMarketPrcKey	STRING	NOT NULL,
+HouseKey	STRING	NOT NULL,
+CustomerCode	STRING	NOT NULL,
+PricingMarketCode	STRING	NOT NULL,
+SYS_DATE_CREATE	TIMESTAMP	NOT NULL
+);
 
 
  -------------------------------------------- Create staging GOLD layer Tables ---------------------
