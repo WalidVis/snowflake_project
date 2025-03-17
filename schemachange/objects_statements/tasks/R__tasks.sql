@@ -69,13 +69,13 @@ EXECUTE IMMEDIATE $$
     --------------------------------------------------------------------------
     ---------------------------------------------------
 
-				STREAMING PIPELINE TASKS
+				-- STREAMING PIPELINE TASKS
 
     ---------------------------------------------------
     --------------------------------------------------------------------------
     ---------------------------------------------------
 
-
+/*
 CREATE OR REPLACE TASK SILVER_LAYER."ingest_stream_PRC_BENCHMARK_silver"
 WAREHOUSE = compute_wh
 WHEN SYSTEM$STREAM_HAS_DATA('BRONZE_LAYER.PRC_BENCHMARK_BRZ_STREAM')
@@ -83,3 +83,4 @@ AS
 insert into SILVER_LAYER.PRC_BENCHMARK_SLV_STREAM  (SELECT * from BRONZE_LAYER.PRC_BENCHMARK_BRZ_STREAM);
 
 	ALTER TASK "ingest_stream_PRC_BENCHMARK_silver" RESUME; 
+	*/
