@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE BRONZE_LAYER.INGEST_FILE_PROC("SRC_SCHEMA" VARCHAR, "TARGET_TABLE_ABS_NAME" VARCHAR, "STAGE_NAME" VARCHAR, "STAGE_SUFFIX_DIRECTORY_PATH" VARCHAR, "PATTERN_FILE_NAME" VARCHAR, "FILE_FORMAT" VARCHAR, "ON_ERROR_OPTION" VARCHAR)
+CREATE OR REPLACE PROCEDURE DEV_POC_VISEO_DB.BRONZE_LAYER.INGEST_FILE_PROC("SRC_SCHEMA" VARCHAR, "TARGET_TABLE_ABS_NAME" VARCHAR, "STAGE_NAME" VARCHAR, "STAGE_SUFFIX_DIRECTORY_PATH" VARCHAR, "PATTERN_FILE_NAME" VARCHAR, "FILE_FORMAT" VARCHAR, "ON_ERROR_OPTION" VARCHAR)
 RETURNS TABLE ()
 LANGUAGE SQL
 EXECUTE AS CALLER
@@ -85,19 +85,19 @@ values(\\''''|| v_file_name ||''\\'', ''|| layer ||'', \\''''|| v_status || ''\\
 EXCEPTION
   WHEN statement_error THEN
     query_result := (SELECT ''Statement_error'' as ERROR_TYPE, :sqlcode as SQL_CODE, :sqlerrm as ERROR_MESS , 
-    :sqlstate as STATE, ''FAILED'' as status, :query as QUERY);
+    :sqlstate as STATE, ''FAILED'' as "status", :query as QUERY);
     insert into monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :sqlerrm);
     return table(query_result);
   
   WHEN EXPRESSION_ERROR THEN
      query_result := (SELECT ''Expression_error'' as ERROR_TYPE, :sqlcode as SQL_CODE, :sqlerrm as ERROR_MESS,
-     :sqlstate as STATE, ''FAILED'' as status, :query as QUERY);
+     :sqlstate as STATE, ''FAILED'' as "status", :query as QUERY);
      insert into monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :sqlerrm);
     return table(query_result);
     
   WHEN OTHER THEN
     query_result := (SELECT ''Other'' as ERROR_TYPE, :sqlcode as SQL_CODE, :sqlerrm as ERROR_MESSAGE , 
-    :sqlstate as SQL_STATE, ''FAILED'' as status, :query as QUERY);
+    :sqlstate as SQL_STATE, ''FAILED'' as "status", :query as QUERY);
      insert into monitoring_layer.monitoring_ingest(file, layer, status,rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :sqlerrm);
     return table(query_result);
 
