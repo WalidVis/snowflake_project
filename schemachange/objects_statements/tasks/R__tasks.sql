@@ -64,3 +64,34 @@ create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
   "params": "''{ \\"src_schema\\": \\"raw_layer\\",  \\"target_table\\": \\"bronze_layer.PRC_CAMPAIGN_MARKET_BRZ\\",  \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CAMPAIGN_MARKET/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"bronze_layer.csv_file_format\\", \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"
 }'
 	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END; $$;
+
+
+---------------------------------------------------
+-------------------------------- SILVER LAYER INGEST TASKS (MUST BE CREATED IN BRONZE LAYER)
+---------------------------------------------------
+
+CREATE TASK BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_silver"
+WAREHOUSE = compute_wh
+AFTER BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
+AS
+insert into SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
+PricingCampaignMarketPrcIntKey,
+    PricingCampaignMarketPrcKey,
+    HouseKey ,
+    CampaignCode ,
+    PricingMarketCode ,
+    RateType ,
+    RateDate ,
+    BaseCampaignCode ,
+    SYS_DATE_CREATE	)  (
+        SELECT hash(COALESCE(CONCAT(PricingMarketCode,'_',CampaignCode), 'N/A')),
+        COALESCE(CONCAT(PricingMarketCode,'_',CampaignCode), 'N/A'),
+            HouseKey ,
+            CampaignCode ,
+            PricingMarketCode ,
+            RateType ,
+            RateDate ,
+            BaseCampaignCode ,
+            CURRENT_TIMESTAMP 
+        from BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ
+    );
