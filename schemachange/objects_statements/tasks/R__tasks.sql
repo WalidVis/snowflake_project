@@ -71,7 +71,7 @@ create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
 ---------------------------------------------------
 
 
-CREATE OR REPLACE TASK BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_silver"
+CREATE OR REPLACE TASK BRONZE_LAYER."ingest_PRC_DIM_CAMPAIGN_MARKET_silver"
 WAREHOUSE = compute_wh
 AFTER BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
 AS 
