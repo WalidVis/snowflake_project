@@ -70,10 +70,15 @@ create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
 -------------------------------- SILVER LAYER INGEST TASKS (MUST BE CREATED IN BRONZE LAYER)
 ---------------------------------------------------
 
-CREATE TASK BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_silver"
+
+CREATE OR REPLACE TASK BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_silver"
 WAREHOUSE = compute_wh
 AFTER BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
-AS
+AS 
+EXECUTE IMMEDIATE
+$$
+BEGIN 
+truncate SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV;
 insert into SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
 PricingCampaignMarketPrcIntKey,
     PricingCampaignMarketPrcKey,
@@ -95,3 +100,17 @@ PricingCampaignMarketPrcIntKey,
             CURRENT_TIMESTAMP 
         from BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ
     );
+    let execution_status VARCHAR;
+    let error_code VARCHAR;
+    let error_message VARCHAR;
+    let rows_produced NUMBER;
+    let rows_inserted NUMBER;
+    SELECT EXECUTION_STATUS, ERROR_CODE,ERROR_MESSAGE,  ROWS_PRODUCED, ROWS_INSERTED
+INTO :execution_status, :error_code, error_message, :rows_produced, :rows_inserted
+FROM table (information_schema.QUERY_HISTORY_BY_SESSION())
+WHERE QUERY_ID = LAST_QUERY_ID();
+    
+    insert into monitoring_layer.monitoring_ingest( src_table,layer, status, ingestion_time, rows_parsed, rows_loaded, first_error)  
+   select 'PRC_CAMPAIGN_MARKET_BRZ', 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
+   
+   END; $$;

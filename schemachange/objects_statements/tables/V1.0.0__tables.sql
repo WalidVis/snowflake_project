@@ -85,8 +85,9 @@ create or replace table BRONZE_LAYER.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ
   HouseKey VARCHAR not null,
   PricingMarketCode VARCHAR not null,
   SYS_SOURCE_DATE VARCHAR,
-  create_date TIMESTAMP_LTZ, -- valued with copy into command metadata
-  file_name VARCHAR -- valued with copy into command metadata
+  CREATE_DATE TIMESTAMP_LTZ COMMENT 'valued with Copy into command metadata',
+  file_name VARCHAR COMMENT 'valued with Copy into command metadata',
+  PRIMARY KEY(CustomerCode, HouseKey, PricingMarketCode)
 );
 
 
@@ -98,8 +99,9 @@ create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 	RateType VARCHAR,
 	RateDate VARCHAR,
 	SYS_SOURCE_DATE VARCHAR,
-    CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
-    file_name VARCHAR -- valued with copy into command metadata
+    CREATE_DATE TIMESTAMP_LTZ COMMENT 'valued with Copy into command metadata',
+    file_name VARCHAR COMMENT 'valued with Copy into command metadata',
+    PRIMARY KEY(PricingMarketCode, CampaignCode)
 );
 
 
