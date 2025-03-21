@@ -118,6 +118,17 @@ CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_PRODUCT_BRZ (
   PRIMARY KEY(HouseKey, IDProduct)
 );
 
+create or replace TABLE BRONZE_LAYER.PRC_GEOGRAPHY_BRZ (
+    IDGeo VARCHAR NOT NULL,
+    IDGeoName VARCHAR,
+    AGUKCode VARCHAR,
+    Source VARCHAR,
+    SYS_SOURCE_DATE VARCHAR,
+    CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
+    file_name VARCHAR, -- valued with copy into command metadata
+	primary key (IDGeo)
+);
+
  -------------------------------------------- Create staging SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
@@ -135,6 +146,7 @@ CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
     SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
     PRIMARY KEY (PricingCampaignMarketPrcIntKey)
 );
+
 
 
 CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_SLV(
@@ -162,6 +174,17 @@ CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_PRODUCT_SLV (
   PRIMARY KEY (PricingProductPrcIntKey)
 );
 
+create or replace TABLE SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV (
+    PricingGeographyPrcIntkey NUMERIC NOT NULL,
+    PricingGeographyPrcKey VARCHAR NOT NULL,
+    IDGeo VARCHAR NOT NULL,
+    IDGeoName VARCHAR,
+    AGUKCode VARCHAR,
+    Source VARCHAR,
+    SYS_DATE_CREATE TIMESTAMP_LTZ, -- valued with copy into command metadata
+   
+	primary key (PricingGeographyPrcIntkey)
+);
 
 
  -------------------------------------------- Create staging GOLD layer Tables ---------------------
