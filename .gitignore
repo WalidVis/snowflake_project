@@ -1,6 +1,10 @@
 target/
 .idea/
 wget-log
-.terraform
+.terraform/*
+.terraform/environment
 terraform/.terraform.lock.hcl
+terraform/.terraform
 terraform/test.auto.tfvars
+path/to/venv
+my-venv

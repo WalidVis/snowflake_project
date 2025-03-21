@@ -1,0 +1,20 @@
+[TEST]
+account = "ZYMTTIF-LX92250"
+user = "ADMIN_USER"
+database = "TEST_POC_VISEO_DB"
+role = "TEST_POC_VISEO_ROLE"
+warehouse = "TEST_WH"
+
+[DEV]
+account = "ZYMTTIF-LX92250"
+user = "ADMIN_USER"
+database = "DEV_POC_VISEO_DB"
+role = "DEC_POC_VISEO_ROLE"
+warehouse = "DEV_WH"
+
+[PROD]
+account = "SCDVOTC-GJ23748"
+user = "TerraF_User"
+database = "PROD_POC_VISEO_DB"
+role = "PROD_POC_VISEO_ROLE"
+warehouse = "PROD_WH"

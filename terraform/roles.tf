@@ -13,6 +13,6 @@ resource "snowflake_grant_account_role" "rolegrant" {
 resource "snowflake_grant_account_role" "grants" {
   provider  = snowflake.security_admin
   role_name = snowflake_account_role.role.name
-  user_name = "TERRAF_USER"
+  user_name = "ADMIN_USER"
   //user_name = snowflake_user.user.name
 }

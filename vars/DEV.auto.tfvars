@@ -5,5 +5,7 @@
 # - Files named exactly terraform.tfvars or terraform.tfvars.json.
 # - Any files with names ending in .auto.tfvars or .auto.tfvars.json.
 
+# !!!!! File name must got the environment part in UPPERCASE for CD workflow_dispatch action !!!!
+
 environment    = "DEV"
 warehouse_size = "x-small"
