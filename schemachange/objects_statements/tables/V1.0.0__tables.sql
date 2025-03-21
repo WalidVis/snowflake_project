@@ -162,6 +162,19 @@ create or replace TABLE BRONZE_LAYER.PRC_PRICING_MARKET_BRZ (
 	primary key (HouseKey , PricingMarketCode )
 );
 
+create or replace TABLE BRONZE_LAYER.PRC_CAMPAIGN_BRZ (
+	HOUSEKEY VARCHAR NOT NULL,
+	CAMPAIGNCODE VARCHAR NOT NULL,
+	CAMPAIGNNAME VARCHAR,
+	CAMPAIGNDESCRIPTION VARCHAR,
+	HISTORICALSELLINFIRSTMONTH VARCHAR,
+	HISTORICALSELLINLASTMONTH VARCHAR,
+	CAMPAIGNDATE VARCHAR,
+    SYS_SOURCE_DATE VARCHAR,
+    CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
+    file_name VARCHAR, -- valued with copy into command metadata
+	primary key (HOUSEKEY, CAMPAIGNCODE)
+);
  -------------------------------------------- Create staging SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
@@ -250,6 +263,19 @@ create or replace TABLE SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV (
     LastEvolution VARCHAR,
     SYS_DATE_CREATE TIMESTAMP_LTZ,
 	primary key (PricingMarketPrcIntKey)
+);
+create or replace TABLE SILVER_LAYER.PRICING_DIM_CAMPAIGN_PRC_SLV (
+	PricingCampaignPrcIntKey NUMBER NOT NULL PRIMARY KEY,
+    PricingCampaignPrcKey VARCHAR NOT NULL,
+    HOUSEKEY VARCHAR NOT NULL,
+	CAMPAIGNCODE VARCHAR NOT NULL,
+	CAMPAIGNNAME VARCHAR,
+	CAMPAIGNDESCRIPTION VARCHAR,
+	HISTORICALSELLINFIRSTMONTH VARCHAR,
+	HISTORICALSELLINLASTMONTH VARCHAR,
+	CAMPAIGNDATE VARCHAR,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ
+	
 );
  -------------------------------------------- Create staging GOLD layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------

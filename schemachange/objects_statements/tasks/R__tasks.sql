@@ -94,6 +94,19 @@ EXECUTE IMMEDIATE $$
 	END;
 	$$;
 ---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task DEV_POC_VISEO_DB.BRONZE_LAYER."ingest_PRC_CAMPAIGN_csv"
+	warehouse=COMPUTE_WH
+	schedule='USING CRON 1 1 * * * Europe/Paris'
+	config='{
+  "params": "''{ \\"src_schema\\": \\"DEV_POC_VISEO_DB.raw_layer\\",  \\"target_table\\": \\"DEV_POC_VISEO_DB.bronze_layer.PRC_CAMPAIGN_BRZ\\",  \\"stage_name\\": \\"@DEV_POC_VISEO_DB.raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CAMPAIGN/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"DEV_POC_VISEO_DB.bronze_layer.csv_file_format\\", \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@DEV_POC_VISEO_DB.RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"
+}'
+	as BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "DEV_POC_VISEO_DB"."BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;
+
+
+---------------------------------------------------
 -------------------------------- SILVER LAYER INGEST TASKS (MUST BE CREATED IN BRONZE LAYER)
 ---------------------------------------------------
 
@@ -274,3 +287,31 @@ WHERE QUERY_ID = LAST_QUERY_ID();
    
    END; $$;
 
+CREATE or replace TASK BRONZE_LAYER."ingest_PRICING_DIM_CAMPAIGN_PRC_silver"
+WAREHOUSE = compute_wh
+AFTER BRONZE_LAYER."ingest_PRC_CAMPAIGN_csv"
+AS
+insert into SILVER_LAYER.PRICING_DIM_CAMPAIGN_PRC_SLV(
+    PricingCampaignPrcIntKey ,
+    PricingCampaignPrcKey ,
+    HOUSEKEY ,
+	CAMPAIGNCODE ,
+	CAMPAIGNNAME ,
+	CAMPAIGNDESCRIPTION ,
+	HISTORICALSELLINFIRSTMONTH ,
+	HISTORICALSELLINLASTMONTH ,
+	CAMPAIGNDATE ,
+    SYS_DATE_CREATE	)  (
+        SELECT 
+            hash(COALESCE(CONCAT(HOUSEKEY,'_',CAMPAIGNCODE), 'N/A')),
+            COALESCE(CONCAT(TRIM(CampaignCode),'_',TRIM(HOUSEKEY)), 'N/A'),
+            HOUSEKEY ,
+        	CAMPAIGNCODE ,
+        	CAMPAIGNNAME ,
+        	CAMPAIGNDESCRIPTION ,
+        	HISTORICALSELLINFIRSTMONTH ,
+        	HISTORICALSELLINLASTMONTH ,
+        	CAMPAIGNDATE ,
+            CURRENT_TIMESTAMP 
+        from BRONZE_LAYER.PRC_CAMPAIGN_BRZ
+    );
