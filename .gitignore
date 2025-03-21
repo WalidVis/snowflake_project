@@ -7,3 +7,4 @@ terraform/.terraform.lock.hcl
 terraform/.terraform
 terraform/test.auto.tfvars
 path/to/venv
+my-venv
