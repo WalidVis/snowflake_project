@@ -71,7 +71,7 @@ create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
 ---------------------------------------------------
 
 
-CREATE OR REPLACE TASK BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_silver"
+CREATE OR REPLACE TASK BRONZE_LAYER."ingest_PRC_DIM_CAMPAIGN_MARKET_silver"
 WAREHOUSE = compute_wh
 AFTER BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
 AS 
@@ -111,6 +111,6 @@ FROM table (information_schema.QUERY_HISTORY_BY_SESSION())
 WHERE QUERY_ID = LAST_QUERY_ID();
     
     insert into monitoring_layer.monitoring_ingest( src_table,layer, status, ingestion_time, rows_parsed, rows_loaded, first_error)  
-   select 'PRC_CAMPAIGN_MARKET_BRZ', 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
+   select ARRAY_CONSTRUCT('PRC_CAMPAIGN_MARKET_BRZ'), 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
    
    END; $$;

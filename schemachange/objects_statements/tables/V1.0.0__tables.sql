@@ -67,7 +67,7 @@ create or replace stage RAW_LAYER.EXTERNAL_AZUR_STAGE
  -------------------------------------------- Create staging BRONZE layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
-create or replace table BRONZE_LAYER.PRC_BENCHMARK_BRZ
+CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_BENCHMARK_BRZ
 (
   APUKCode VARCHAR not null,
   Anabench2Code VARCHAR not null,
@@ -79,7 +79,7 @@ create or replace table BRONZE_LAYER.PRC_BENCHMARK_BRZ
 );
 
 
-create or replace table BRONZE_LAYER.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ
+CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ
 (
   CustomerCode VARCHAR not null,
   HouseKey VARCHAR not null,
@@ -91,7 +91,7 @@ create or replace table BRONZE_LAYER.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ
 );
 
 
-create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
+CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 	PricingMarketCode VARCHAR not null,
 	CampaignCode VARCHAR not null,
 	HouseKey VARCHAR not null,
@@ -105,6 +105,18 @@ create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 );
 
 
+CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_PRODUCT_BRZ (
+  APUKCode VARCHAR,
+  HouseKey NUMBER not null,
+  IDProduct VARCHAR not null,
+  IDProductName VARCHAR,
+  SYS_SOURCE_DATE VARCHAR,
+  Size NUMBER,
+  Source VARCHAR,
+  CREATE_DATE TIMESTAMP_LTZ COMMENT 'valued with Copy into command metadata',
+  file_name VARCHAR COMMENT 'valued with Copy into command metadata',
+  PRIMARY KEY(HouseKey, IDProduct)
+);
 
  -------------------------------------------- Create staging SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
@@ -112,7 +124,7 @@ create or replace table BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ (
 
 
 CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
-    PricingCampaignMarketPrcIntKey NUMBER NOT NULL PRIMARY KEY,
+    PricingCampaignMarketPrcIntKey NUMBER NOT NULL,
     PricingCampaignMarketPrcKey	VARCHAR NOT NULL,
     HouseKey VARCHAR NOT NULL,
     CampaignCode VARCHAR NOT NULL,
@@ -120,19 +132,36 @@ CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
     RateType VARCHAR,
     RateDate DATE,
     BaseCampaignCode VARCHAR,
-    SYS_DATE_CREATE	TIMESTAMP_LTZ
+    SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
+    PRIMARY KEY (PricingCampaignMarketPrcIntKey)
 );
 
 
-
 CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_SLV(
-    PricingCustomerErpPricingMarketPrcIntKey NUMBER	NOT NULL PRIMARY KEY,
+    PricingCustomerErpPricingMarketPrcIntKey NUMBER	NOT NULL,
     PricingCustomerErpPricingMarketPrcKey VARCHAR NOT NULL,
     HouseKey VARCHAR NOT NULL,
     CustomerCode VARCHAR NOT NULL,
     PricingMarketCode VARCHAR NOT NULL,
-    SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL
+    SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
+    PRIMARY KEY (PricingCustomerErpPricingMarketPrcIntKey)
 );
+
+
+CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_PRODUCT_SLV (
+  PricingProductPrcIntKey NUMBER not null,
+  PricingProductPrcKey VARCHAR not null,
+  APUKCode VARCHAR,
+  HouseKey NUMBER not null,
+  IDProduct VARCHAR not null,
+  IDProductName VARCHAR,
+  SYS_SOURCE_DATE VARCHAR,
+  Size NUMBER,
+  Source VARCHAR,
+  SYS_DATE_CREATE TIMESTAMP_LTZ not null,
+  PRIMARY KEY (PricingProductPrcIntKey)
+);
+
 
 
  -------------------------------------------- Create staging GOLD layer Tables ---------------------
