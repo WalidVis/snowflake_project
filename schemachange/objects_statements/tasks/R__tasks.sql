@@ -190,9 +190,9 @@ WHERE QUERY_ID = LAST_QUERY_ID();
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
-create or replace task DEV_POC_VISEO_DB.BRONZE_LAYER."ingest_DIM_PRC_PRICING_MARKET_SLV_silver" warehouse = COMPUTE_WH
+create or replace task BRONZE_LAYER."ingest_DIM_PRC_PRICING_MARKET_SLV_silver" warehouse = COMPUTE_WH
 after
-  DEV_POC_VISEO_DB.BRONZE_LAYER."ingest_PRC_PRICING_MARKET_BRZ_json" as EXECUTE IMMEDIATE $$
+  BRONZE_LAYER."ingest_PRC_PRICING_MARKET_BRZ_json" as EXECUTE IMMEDIATE $$
 BEGIN 
 truncate SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV;
 insert into SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV
