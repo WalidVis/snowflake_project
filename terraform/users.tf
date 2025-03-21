@@ -1,4 +1,4 @@
-/*resource "snowflake_user" "walid_cheriet" {
+resource "snowflake_user" "walid_cheriet" {
   provider             = snowflake.security_admin
   name                 = "WALID_CHERIET"
   default_warehouse    = snowflake_warehouse.warehouse.name
@@ -70,4 +70,3 @@ resource "snowflake_user" "amine_snoussi" {
   // rsa_public_key    = substr(tls_private_key.svc_key.public_key_pem, 27, 398)
 }
 
-*/
