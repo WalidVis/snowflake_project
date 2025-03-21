@@ -78,6 +78,22 @@ create or replace task BRONZE_LAYER."ingest_PRC_GEOGRAPHY_BRZ_json"
 	END;
 	$$;
 ---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task BRONZE_LAYER."ingest_PRC_PRICING_MARKET_BRZ_json"
+	warehouse=COMPUTE_WH
+	schedule='USING CRON 0 5 * * * Europe/Paris'
+	--  [ TASK_AUTO_RETRY_ATTEMPTS = <num> ] 
+	config='{"params":"''{ \\"src_schema\\": \\"raw_layer\\", \\"target_table\\": \\"BRONZE_LAYER.PRC_PRICING_MARKET_BRZ\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\", \\"stage_path_suffix\\" :\\"/PRC_PRICING_MARKET/\\", \\"pattern_file_name\\": \\".*.json\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\", \\"on_error\\": \\"CONTINUE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"}'
+as
+EXECUTE IMMEDIATE $$
+	BEGIN
+	    LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string;
+	    EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS);
+	END;
+	$$;
+---------------------------------------------------
 -------------------------------- SILVER LAYER INGEST TASKS (MUST BE CREATED IN BRONZE LAYER)
 ---------------------------------------------------
 
@@ -170,3 +186,91 @@ WHERE QUERY_ID = LAST_QUERY_ID();
    select ARRAY_CONSTRUCT('PRC_GEOGRAPHY_BRZ'), 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
    
    END; $$;
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task DEV_POC_VISEO_DB.BRONZE_LAYER."ingest_DIM_PRC_PRICING_MARKET_SLV_silver" warehouse = COMPUTE_WH
+after
+  DEV_POC_VISEO_DB.BRONZE_LAYER."ingest_PRC_PRICING_MARKET_BRZ_json" as EXECUTE IMMEDIATE $$
+BEGIN 
+truncate SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV;
+insert into SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV
+(
+    PricingMarketPrcIntKey,
+    PricingMarketPrcKey,
+    HouseKey,
+    PricingMarketCode,
+    PricingMarketName,
+    PricingMarketRule,
+    RegionCode,
+    RegionName,
+    CountryCode,
+    CountryName,
+    DefaultCurrency,
+    VAT,
+    NoticePeriod,
+    IsSrpMarket,
+    SellInParentMarket,
+    SapCode,
+    OldOrionCode,
+    DistributionChannelCode,
+    DistributionChannelName,
+    SalesOrganisationCode,
+    SalesOrganisationName,
+    CustomerPriceGroupCode,
+    CustomerPriceGroupName,
+    CustomerCode,
+    CustomerName,
+    LastCampaignCode,
+    LastMarketRational,
+    LastEvolution,
+    SYS_DATE_CREATE	)  (
+        SELECT 
+            hash(COALESCE(CONCAT(HouseKey,'_',PricingMarketCode), 'N/A')),
+            COALESCE(TRIM(PricingMarketCode), 'N/A'),
+            HouseKey,
+            PricingMarketCode,
+            PricingMarketName,
+            PricingMarketRule,
+            RegionCode,
+            RegionName,
+            CountryCode,
+            CountryName,
+            DefaultCurrency,
+            VAT,
+            NoticePeriod,
+            IsSrpMarket,
+            SellInParentMarket,
+            SapCode,
+            OldOrionCode,
+            DistributionChannelCode,
+            DistributionChannelName,
+            SalesOrganisationCode,
+            SalesOrganisationName,
+            CustomerPriceGroupCode,
+            CustomerPriceGroupName,
+            CustomerCode,
+            CustomerName,
+            LastCampaignCode,
+            LastMarketRational,
+            LastEvolution,
+            CURRENT_TIMESTAMP 
+        from BRONZE_LAYER.PRC_PRICING_MARKET_BRZ
+
+    );
+    let execution_status VARCHAR;
+    let error_code VARCHAR;
+    let error_message VARCHAR;
+    let rows_produced NUMBER;
+    let rows_inserted NUMBER;
+    SELECT EXECUTION_STATUS, ERROR_CODE,ERROR_MESSAGE,  ROWS_PRODUCED, ROWS_INSERTED
+INTO :execution_status, :error_code, error_message, :rows_produced, :rows_inserted
+FROM table (information_schema.QUERY_HISTORY_BY_SESSION())
+WHERE QUERY_ID = LAST_QUERY_ID();
+    
+    insert into monitoring_layer.monitoring_ingest( src_table,layer, status, ingestion_time, rows_parsed, rows_loaded, first_error)  
+   select ARRAY_CONSTRUCT('PRC_PRICING_MARKET_BRZ'), 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
+   
+   END; $$;
+

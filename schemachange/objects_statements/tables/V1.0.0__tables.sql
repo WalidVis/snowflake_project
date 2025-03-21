@@ -129,6 +129,39 @@ create or replace TABLE BRONZE_LAYER.PRC_GEOGRAPHY_BRZ (
 	primary key (IDGeo)
 );
 
+create or replace TABLE BRONZE_LAYER.PRC_PRICING_MARKET_BRZ (
+    HouseKey VARCHAR,
+    PricingMarketCode VARCHAR,
+    PricingMarketName VARCHAR,
+    PricingMarketRule VARCHAR,
+    RegionCode VARCHAR,
+    RegionName VARCHAR,
+    CountryCode VARCHAR,
+    CountryName VARCHAR,
+    DefaultCurrency VARCHAR,
+    VAT VARCHAR,
+    NoticePeriod VARCHAR,
+    IsSrpMarket VARCHAR,
+    SellInParentMarket VARCHAR,
+    SapCode VARCHAR,
+    OldOrionCode VARCHAR,
+    DistributionChannelCode VARCHAR,
+    DistributionChannelName VARCHAR,
+    SalesOrganisationCode VARCHAR,
+    SalesOrganisationName VARCHAR,
+    CustomerPriceGroupCode VARCHAR,
+    CustomerPriceGroupName VARCHAR,
+    CustomerCode VARCHAR,
+    CustomerName VARCHAR,
+    LastCampaignCode VARCHAR,
+    LastMarketRational VARCHAR,
+    LastEvolution VARCHAR,
+    SYS_SOURCE_DATE VARCHAR,
+    CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
+    file_name VARCHAR, -- valued with copy into command metadata
+	primary key (HouseKey , PricingMarketCode )
+);
+
  -------------------------------------------- Create staging SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
@@ -186,7 +219,38 @@ create or replace TABLE SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV (
 	primary key (PricingGeographyPrcIntkey)
 );
 
-
+create or replace TABLE SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV (
+    PricingMarketPrcIntKey NUMERIC NOT NULL,
+    PricingMarketPrcKey VARCHAR NOT NULL,
+    HouseKey VARCHAR,
+    PricingMarketCode VARCHAR,
+    PricingMarketName VARCHAR,
+    PricingMarketRule VARCHAR,
+    RegionCode VARCHAR,
+    RegionName VARCHAR,
+    CountryCode VARCHAR,
+    CountryName VARCHAR,
+    DefaultCurrency VARCHAR,
+    VAT VARCHAR,
+    NoticePeriod VARCHAR,
+    IsSrpMarket VARCHAR,
+    SellInParentMarket VARCHAR,
+    SapCode VARCHAR,
+    OldOrionCode VARCHAR,
+    DistributionChannelCode VARCHAR,
+    DistributionChannelName VARCHAR,
+    SalesOrganisationCode VARCHAR,
+    SalesOrganisationName VARCHAR,
+    CustomerPriceGroupCode VARCHAR,
+    CustomerPriceGroupName VARCHAR,
+    CustomerCode VARCHAR,
+    CustomerName VARCHAR,
+    LastCampaignCode VARCHAR,
+    LastMarketRational VARCHAR,
+    LastEvolution VARCHAR,
+    SYS_DATE_CREATE TIMESTAMP_LTZ,
+	primary key (PricingMarketPrcIntKey)
+);
  -------------------------------------------- Create staging GOLD layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
