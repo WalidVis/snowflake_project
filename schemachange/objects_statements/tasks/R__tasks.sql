@@ -97,7 +97,7 @@ EXECUTE IMMEDIATE $$
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
-create or replace task DEV_POC_VISEO_DB.BRONZE_LAYER."ingest_PRC_CAMPAIGN_csv"
+create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_csv"
 	warehouse=COMPUTE_WH
 	schedule='USING CRON 1 1 * * * Europe/Paris'
 	config='{
