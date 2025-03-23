@@ -217,14 +217,15 @@ CREATE OR REPLACE TABLE GOLD_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_GLD(
 
  -------------------------------------------- Create Monitoring Tables ---------------------
 
-create or replace table MONITORING_LAYER.MONITORING_INGEST
+
+CREATE OR REPLACE TABLE MONITORING_LAYER.MONITORING_INGEST
 (
   file VARCHAR(200),
-  src_table VARCHAR(100),
+  src_table ARRAY,
   layer VARCHAR(20),
   status VARCHAR(50) not null,
   ingestion_time TIMESTAMP_LTZ,
-  rows_parsed NUMBER(15,0),
+  rows_parsed NUMBER(15,0), // A QUOI CORRESPOND RAW_PARSED
   rows_loaded NUMBER(15,0),
   errors_seen NUMBER(15,0),
   first_error VARCHAR(2000),
