@@ -113,7 +113,7 @@ resource "snowflake_grant_privileges_to_account_role" "schema_grant_monitoring" 
 resource "snowflake_grant_privileges_to_account_role" "executetask" {
   provider          = snowflake.account_admin
   account_role_name = snowflake_account_role.role.name
-  privileges        = ["EXECUTE TASK", "MONITOR EXECUTION"]
+  privileges        = ["EXECUTE TASK", "MONITOR EXECUTION", "EXECUTE MANAGED TASK"]
   on_account        = true
 
 }
