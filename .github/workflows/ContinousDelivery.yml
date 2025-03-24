@@ -116,8 +116,8 @@ jobs:
         run: |
           echo "Running schemachange TO EXEC"
           if [[ "${{ github.ref }}" == "refs/heads/main" && ${{ github.event_name }} == 'push' ]]; then
-            schemachange deploy --config-folder . --connections-file-path ./connection.toml  --connection-name TEST -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY        
+            schemachange deploy --config-folder . --connections-file-path ./connection.toml  --connection-name TEST --vars '{"ENVIRONMENT": "TEST" }' -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY        
           else
-            schemachange deploy --config-folder . --connections-file-path ./connection.toml  --connection-name "${{ github.event.inputs.ENVIRONMENT }}" -c "${{ github.event.inputs.ENVIRONMENT }}"_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY                
+            schemachange deploy --config-folder . --connections-file-path ./connection.toml  --connection-name "${{ github.event.inputs.ENVIRONMENT }}" --vars '{"ENVIRONMENT": ${{ github.event.inputs.ENVIRONMENT }} }' -c "${{ github.event.inputs.ENVIRONMENT }}"_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY                
           fi
 
