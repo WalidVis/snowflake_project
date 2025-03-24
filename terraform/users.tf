@@ -4,9 +4,7 @@ resource "snowflake_user" "walid_cheriet" {
   default_warehouse    = snowflake_warehouse.warehouse.name
   default_role         = snowflake_account_role.role.name
   display_name         = "walid_cheriet"
-  password             = "Temporarypassword123!"
-  must_change_password = "true"
-}
+  password             = "Temporarypassword123!"}
 
 resource "snowflake_user" "saif_bouaziz" {
   provider             = snowflake.security_admin
@@ -15,7 +13,6 @@ resource "snowflake_user" "saif_bouaziz" {
   default_role         = snowflake_account_role.role.name
   display_name         = "saif_bouaziz_test_change"
   password             = "Temporarypassword123!"
-  must_change_password = "true"
 }
 
 resource "snowflake_user" "zied_maalej" {
@@ -25,7 +22,6 @@ resource "snowflake_user" "zied_maalej" {
   default_role         = snowflake_account_role.role.name
   display_name         = "zied_maalej"
   password             = "Temporarypassword123!"
-  must_change_password = "true"
 }
 
 resource "snowflake_user" "issam_eddaou" {
@@ -35,7 +31,6 @@ resource "snowflake_user" "issam_eddaou" {
   default_role         = snowflake_account_role.role.name
   display_name         = "issam_eddaou"
   password             = "Temporarypassword123!"
-  must_change_password = "true"
 }
 
 resource "snowflake_user" "rihab_bahri" {
@@ -45,7 +40,6 @@ resource "snowflake_user" "rihab_bahri" {
   default_role         = snowflake_account_role.role.name
   display_name         = "rihab_bahri"
   password             = "Temporarypassword123!"
-  must_change_password = "true"
 }
 
 resource "snowflake_user" "matthieu_noiret" {
@@ -55,7 +49,6 @@ resource "snowflake_user" "matthieu_noiret" {
   default_role         = snowflake_account_role.role.name
   display_name         = "matthieu_noiret"
   password             = "Temporarypassword123!"
-  must_change_password = "true"
 }
 
 resource "snowflake_user" "amine_snoussi" {
@@ -65,7 +58,6 @@ resource "snowflake_user" "amine_snoussi" {
   default_role         = snowflake_account_role.role.name
   display_name         = "amine_snoussi"
   password             = "Temporarypassword123!"
-  must_change_password = "true"
   // default_namespace = "${snowflake_database.db.name}.${snowflake_schema.schema.name}"
   // rsa_public_key    = substr(tls_private_key.svc_key.public_key_pem, 27, 398)
 }
