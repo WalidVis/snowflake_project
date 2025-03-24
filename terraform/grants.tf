@@ -1,4 +1,4 @@
-/*
+
 resource "snowflake_grant_account_role" "grant_poc_viseo_role_sbouaziz" {
   provider  = snowflake.security_admin
   role_name = snowflake_account_role.role.name
@@ -42,4 +42,3 @@ resource "snowflake_grant_account_role" "grant_poc_viseo_role_asnoussi" {
   user_name = snowflake_user.amine_snoussi.name
 }
 
-*/
