@@ -141,6 +141,6 @@ jobs: # Job: set of steps in workflow executed on same runner (shell script, or 
         if: github.event_name == 'pull_request'
         run: |
           echo "Step PR: Running schemachange DRY RUN"
-          schemachange --config-folder . --connections-file-path ./connection.toml  --connection-name TEST -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
+          schemachange --config-folder . --connections-file-path ./connection.toml  --connection-name TEST --vars '{"ENVIRONMENT": "TEST" }' -c TEST_POC_VISEO_DB.MONITORING_LAYER.CHANGE_HISTORY --dry-run
           
  ######################################################################################################
