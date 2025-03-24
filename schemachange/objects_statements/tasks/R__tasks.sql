@@ -6,167 +6,185 @@
 
 -- BATCH PIPELINE TASKS
 
+
+
+
 ---------------------------------------------------
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
-create or replace task BRONZE_LAYER."ingest_PRC_BENCHMARK_LEVEL_csv"
-	warehouse=COMPUTE_WH
+
+create or replace task BRONZE_LAYER.ingest_prc_benchmark_csv
+	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 0 5 * * * Europe/Paris'
-	--  [ TASK_AUTO_RETRY_ATTEMPTS = <num> ] 
-	config='{
-  "params": "''{ \\"src_schema\\": \\"raw_layer\\",  \\"target_table\\": \\"bronze_layer.PRC_BENCHMARK_LEVEL\\",  \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_BENCHMARK_LEVEL/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"bronze_layer.csv_file_format\\", \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"
-}'
-as
-EXECUTE IMMEDIATE $$  BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_BENCHMARK/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_BENCHMARK_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_BENCHMARK_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingBenchmarkPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PRICINGBENCHMARKPRCKEY\\", \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(COALESCE(REPLACE(APUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(ANABENCH2, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')))\\", \\"silver_ruleFunctionalKey\\" : \\"CONCAT(COALESCE(REPLACE(APUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(ANABENCH2, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\"}''"}'
+	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_benchmark_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_benchmark_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_benchmark_csv
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_benchmark_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_benchmark_csv RESUME;
+
+
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
-create or replace task BRONZE_LAYER."ingest_PRC_CUSTOMER_ERP_PRICING_MARKET_json"
-	warehouse=COMPUTE_WH
+
+create or replace task BRONZE_LAYER.ingest_prc_benchmark_level_csv
+	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 0 5 * * * Europe/Paris'
-	--  [ TASK_AUTO_RETRY_ATTEMPTS = <num> ] 
-	config='{"params":"''{ \\"src_schema\\": \\"raw_layer\\", \\"target_table\\": \\"BRONZE_LAYER.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\", \\"stage_path_suffix\\" :\\"/PRC_CUSTOMER_ERP_PRICING_MARKET/\\", \\"pattern_file_name\\": \\".*.json\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\", \\"on_error\\": \\"CONTINUE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"}'
-as
-EXECUTE IMMEDIATE $$
-	BEGIN
-	    LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string;
-	    EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS);
-	END;
-	$$;
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_BENCHMARK_LEVEL/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_BENCHMARK_LEVEL_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_BENCHMARK_LEVEL_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingBenchmarkLevelPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingBenchmarkLevelPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(ANABENCH2, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(ANABENCH2, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
+	as EXECUTE IMMEDIATE $$ 
+	 BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_benchmark_level_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_benchmark_level_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_benchmark_level_csv
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_benchmark_level_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_benchmark_level_csv RESUME;
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
 
-create or replace task BRONZE_LAYER."ingest_PRC_BENCHMARK_csv"
-	warehouse=COMPUTE_WH
+create or replace task BRONZE_LAYER.ingest_prc_campaign_market_csv
+	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 0 5 * * * Europe/Paris'
-	--  [ TASK_AUTO_RETRY_ATTEMPTS = <num> ]
-	config='{
-  "params": "''{ \\"src_schema\\": \\"raw_layer\\",  \\"target_table\\": \\"bronze_layer.PRC_BENCHMARK_BRZ\\",  \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_BENCHMARK/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"bronze_layer.csv_file_format\\", \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"
-}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END; $$;
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CAMPAIGN_MARKET/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_CAMPAIGN_MARKET_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_CAMPAIGN_MARKET_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingCampaignMarketPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingCampaignMarketPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(COALESCE(REPLACE(PricingMarketCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CampaignCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')))\\", \\"silver_ruleFunctionalKey\\" : \\"CONCAT(COALESCE(REPLACE(PricingMarketCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CampaignCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\"}''"}'
+	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_market_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_campaign_market_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_campaign_market_csv
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_market_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_market_csv RESUME;
+
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
 
-create or replace task BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
-	warehouse=COMPUTE_WH
-	--  [ TASK_AUTO_RETRY_ATTEMPTS = <num> ]
-	schedule='USING CRON 1 1 * * * Europe/Paris'
-	config='{
-  "params": "''{ \\"src_schema\\": \\"raw_layer\\",  \\"target_table\\": \\"bronze_layer.PRC_CAMPAIGN_MARKET_BRZ\\",  \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CAMPAIGN_MARKET/\\",  \\"pattern_file_name\\": \\".*.csv\\",  \\"file_format\\" : \\"bronze_layer.csv_file_format\\", \\"on_error\\": \\"SKIP_FILE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"
-}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END; $$;
----------------------------------------------------
---------------------------------------------------------------------------
----------------------------------------------------
-create or replace task BRONZE_LAYER."ingest_PRC_GEOGRAPHY_BRZ_json"
-	warehouse=COMPUTE_WH
+create or replace task BRONZE_LAYER.ingest_prc_geography_json
+	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 0 5 * * * Europe/Paris'
-	config='{"params":"''{ \\"src_schema\\": \\"raw_layer\\", \\"target_table\\": \\"BRONZE_LAYER.PRC_GEOGRAPHY_BRZ\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\", \\"stage_path_suffix\\" :\\"/PRC_GEOGRAPHY/\\", \\"pattern_file_name\\": \\".*.json\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\", \\"on_error\\": \\"CONTINUE\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\"}''"}'
-	as EXECUTE IMMEDIATE $$
-	BEGIN
-	    LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string;
-	    EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS);
-	END;
-	$$;
----------------------------------------------------
--------------------------------- SILVER LAYER INGEST TASKS (MUST BE CREATED IN BRONZE LAYER)
----------------------------------------------------
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_GEOGRAPHY/\\", \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_GEOGRAPHY_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_GEOGRAPHY_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingGeographyPrcIntkey\\", \\"silver_functionalKey_name\\" : \\"PricingGeographyPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(IDGeo, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(IDGeo, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
+	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_market_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_geography_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_geography_json
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_geography_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_geography_json RESUME;
 
 
-CREATE OR REPLACE TASK BRONZE_LAYER."ingest_PRC_DIM_CAMPAIGN_MARKET_silver"
-WAREHOUSE = compute_wh
-AFTER BRONZE_LAYER."ingest_PRC_CAMPAIGN_MARKET_csv"
-AS 
-EXECUTE IMMEDIATE
-$$
-BEGIN 
-truncate SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV;
-insert into SILVER_LAYER.DIM_PRC_CAMPAIGN_MARKET_SLV(
-PricingCampaignMarketPrcIntKey,
-    PricingCampaignMarketPrcKey,
-    HouseKey ,
-    CampaignCode ,
-    PricingMarketCode ,
-    RateType ,
-    RateDate ,
-    BaseCampaignCode ,
-    SYS_DATE_CREATE	)  (
-        SELECT hash(COALESCE(CONCAT(PricingMarketCode,'_',CampaignCode), 'N/A')),
-        COALESCE(CONCAT(PricingMarketCode,'_',CampaignCode), 'N/A'),
-            HouseKey ,
-            CampaignCode ,
-            PricingMarketCode ,
-            RateType ,
-            RateDate ,
-            BaseCampaignCode ,
-            CURRENT_TIMESTAMP 
-        from BRONZE_LAYER.PRC_CAMPAIGN_MARKET_BRZ
-    );
-    let execution_status VARCHAR;
-    let error_code VARCHAR;
-    let error_message VARCHAR;
-    let rows_produced NUMBER;
-    let rows_inserted NUMBER;
-    SELECT EXECUTION_STATUS, ERROR_CODE,ERROR_MESSAGE,  ROWS_PRODUCED, ROWS_INSERTED
-INTO :execution_status, :error_code, error_message, :rows_produced, :rows_inserted
-FROM table (information_schema.QUERY_HISTORY_BY_SESSION())
-WHERE QUERY_ID = LAST_QUERY_ID();
-    
-    insert into monitoring_layer.monitoring_ingest( src_table,layer, status, ingestion_time, rows_parsed, rows_loaded, first_error)  
-   select ARRAY_CONSTRUCT('PRC_CAMPAIGN_MARKET_BRZ'), 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
-   
-   END; $$;
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_json
+	warehouse={{ ENVIRONMENT}}_WH
+	schedule='USING CRON 0 5 * * * Europe/Paris'
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CUSTOMER_ERP_PRICING_MARKET/\\", \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingCustomerErpPricingMarketPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingCustomerErpPricingMarketPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(COALESCE(REPLACE(PricingMarketCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CustomerCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')))\\", \\"silver_ruleFunctionalKey\\" : \\"CONCAT(COALESCE(REPLACE(PricingMarketCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CustomerCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\"}''"}'
+	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_json SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_json
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_json RESUME;
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task BRONZE_LAYER.ingest_prc_generic_geography_csv
+	warehouse={{ ENVIRONMENT}}_WH
+	schedule='USING CRON 0 5 * * * Europe/Paris'
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_GENERIC_GEOGRAPHY/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_GENERIC_GEOGRAPHY_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_GENERIC_GEOGRAPHY_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingGenericGeographyPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingGenericGeographyPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(AGUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(AGUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
+	as EXECUTE IMMEDIATE $$ 
+	 BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_generic_geography_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_generic_geography_csv
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_csv RESUME;
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task BRONZE_LAYER.ingest_prc_generic_product_csv
+	warehouse={{ ENVIRONMENT}}_WH
+	schedule='USING CRON 0 5 * * * Europe/Paris'
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_GENERIC_PRODUCT/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_GENERIC_PRODUCT_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_GENERIC_PRODUCT_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingGenericProductPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingGenericProductPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(APUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(APUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
+	as EXECUTE IMMEDIATE $$ 
+	 BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_generic_product_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_generic_product_csv
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_csv RESUME;
+
 ---------------------------------------------------
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
 
-   create or replace task BRONZE_LAYER."ingest_DIM_PRC_GEOGRAPHY_SLV_silver"
-	warehouse=COMPUTE_WH
-	after BRONZE_LAYER."ingest_PRC_GEOGRAPHY_BRZ_json"
-	as EXECUTE IMMEDIATE $$
-BEGIN 
-truncate SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV;
-insert into SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV
-(
-    PricingGeographyPrcIntkey,
-    PricingGeographyPrcKey,
-    IDGeo,
-    IDGeoName,
-    AGUKCode,
-    Source,
-    SYS_DATE_CREATE	)  (
-SELECT 
-            hash(COALESCE(TRIM(IDGeo), 'N/A')),
-            COALESCE(TRIM(IDGeo), 'N/A'),
-            IDGeo,
-            IDGeoName,
-            AGUKCode,
-            Source,
-            CURRENT_TIMESTAMP 
-from BRONZE_LAYER.PRC_GEOGRAPHY_BRZ
-);
-let execution_status VARCHAR;
-let error_code VARCHAR;
-let error_message VARCHAR;
-let rows_produced NUMBER;
-let rows_inserted NUMBER;
-SELECT 
-EXECUTION_STATUS, ERROR_CODE,ERROR_MESSAGE,  ROWS_PRODUCED, ROWS_INSERTED
-INTO :execution_status, :error_code, error_message, :rows_produced, :rows_inserted
-FROM table (information_schema.QUERY_HISTORY_BY_SESSION())
-WHERE QUERY_ID = LAST_QUERY_ID();
-    
-    insert into monitoring_layer.monitoring_ingest( src_table,layer, status, ingestion_time, rows_parsed, rows_loaded, first_error)  
-   select ARRAY_CONSTRUCT('PRC_GEOGRAPHY_BRZ'), 'SILVER_LAYER', :execution_status, CURRENT_TIMESTAMP(3), :rows_produced, :rows_inserted, :error_message;
-   
-   END; $$;
+create or replace task BRONZE_LAYER.ingest_prc_campaign_csv
+	warehouse={{ ENVIRONMENT}}_WH
+	schedule='USING CRON 0 5 * * * Europe/Paris'
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_CAMPAIGN/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_CAMPAIGN_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_CAMPAIGN_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingCampaignPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingCampaignPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(CampaignCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(CampaignCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
+	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_csv SUSPEND;
+
+create or replace task BRONZE_LAYER.ingest_prc_campaign_silver
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.ingest_prc_campaign_csv
+	as EXECUTE IMMEDIATE $$ 
+	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
+
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_silver RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_campaign_csv RESUME;

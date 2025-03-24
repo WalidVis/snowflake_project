@@ -9,7 +9,7 @@ warehouse = "TEST_WH"
 account = "ZYMTTIF-LX92250"
 user = "ADMIN_USER"
 database = "DEV_POC_VISEO_DB"
-role = "DEC_POC_VISEO_ROLE"
+role = "DEV_POC_VISEO_ROLE"
 warehouse = "DEV_WH"
 
 [PROD]
