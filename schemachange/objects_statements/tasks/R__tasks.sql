@@ -42,7 +42,7 @@ EXECUTE IMMEDIATE $$
 ---------------------------------------------------
 
 
-create or replace task BRONZE_LAYER."ingest_prc_benchmark_csv"
+create or replace task BRONZE_LAYER.ingest_prc_benchmark_csv
 	warehouse=TEST_WH
 	schedule='USING CRON 1 * * * * Europe/Paris'
 	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_BENCHMARK/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_BENCHMARK_BRZ\\",  \\"silver_table\\" :\\"silver_layer.TEST_DIM_PRC_BENCHMARK_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingBenchmarkPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PRICINGBENCHMARKPRCKEY\\", \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(COALESCE(APUKCODE, ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(ANABENCH2, ''\\\\''N/A\\\\'''')))\\", \\"silver_ruleFunctionalKey\\" : \\"CONCAT(COALESCE(APUKCODE, ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(ANABENCH2, ''\\\\''N/A\\\\''''))\\"}''"}'
@@ -50,7 +50,7 @@ create or replace task BRONZE_LAYER."ingest_prc_benchmark_csv"
 
 ALTER TASK ingest_prc_benchmark_csv SUSPEND;
 
-create or replace task BRONZE_LAYER."ingest_prc_benchmark_silver"
+create or replace task BRONZE_LAYER.ingest_prc_benchmark_silver
 	warehouse=TEST_WH
 	after BRONZE_LAYER."ingest_prc_benchmark_csv"
 	as EXECUTE IMMEDIATE $$ 
