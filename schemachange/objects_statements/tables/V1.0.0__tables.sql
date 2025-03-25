@@ -183,6 +183,39 @@ CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_BRZ
   PRIMARY KEY(HouseKey, SyrusMarketCode, PricingMarketCode)
 );
 
+create or replace TABLE BRONZE_LAYER.PRC_PRICING_MARKET_BRZ (
+    HouseKey VARCHAR,
+    PricingMarketCode VARCHAR,
+    PricingMarketName VARCHAR,
+    PricingMarketRule VARCHAR,
+    RegionCode VARCHAR,
+    RegionName VARCHAR,
+    CountryCode VARCHAR,
+    CountryName VARCHAR,
+    DefaultCurrency VARCHAR,
+    VAT VARCHAR,
+    NoticePeriod VARCHAR,
+    IsSrpMarket VARCHAR,
+    SellInParentMarket VARCHAR,
+    SapCode VARCHAR,
+    OldOrionCode VARCHAR,
+    DistributionChannelCode VARCHAR,
+    DistributionChannelName VARCHAR,
+    SalesOrganisationCode VARCHAR,
+    SalesOrganisationName VARCHAR,
+    CustomerPriceGroupCode VARCHAR,
+    CustomerPriceGroupName VARCHAR,
+    CustomerCode VARCHAR,
+    CustomerName VARCHAR,
+    LastCampaignCode VARCHAR,
+    LastMarketRational VARCHAR,
+    LastEvolution VARCHAR,
+    SYS_SOURCE_DATE VARCHAR,
+    CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
+    file_name VARCHAR, -- valued with copy into command metadata
+	primary key (HouseKey , PricingMarketCode )
+);
+
  -------------------------------------------- Create SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
@@ -317,6 +350,38 @@ CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_
     PRIMARY KEY (PricingSyrusMarketNonErpPricingMarketPrcIntKey)
 );
 
+create or replace TABLE SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV (
+    PricingMarketPrcIntKey NUMERIC NOT NULL,
+    PricingMarketPrcKey VARCHAR NOT NULL,
+    HouseKey VARCHAR,
+    PricingMarketCode VARCHAR,
+    PricingMarketName VARCHAR,
+    PricingMarketRule VARCHAR,
+    RegionCode VARCHAR,
+    RegionName VARCHAR,
+    CountryCode VARCHAR,
+    CountryName VARCHAR,
+    DefaultCurrency VARCHAR,
+    VAT VARCHAR,
+    NoticePeriod VARCHAR,
+    IsSrpMarket VARCHAR,
+    SellInParentMarket VARCHAR,
+    SapCode VARCHAR,
+    OldOrionCode VARCHAR,
+    DistributionChannelCode VARCHAR,
+    DistributionChannelName VARCHAR,
+    SalesOrganisationCode VARCHAR,
+    SalesOrganisationName VARCHAR,
+    CustomerPriceGroupCode VARCHAR,
+    CustomerPriceGroupName VARCHAR,
+    CustomerCode VARCHAR,
+    CustomerName VARCHAR,
+    LastCampaignCode VARCHAR,
+    LastMarketRational VARCHAR,
+    LastEvolution VARCHAR,
+    SYS_DATE_CREATE TIMESTAMP_LTZ,
+	primary key (PricingMarketPrcIntKey)
+);
 
 
  -------------------------------------------- Create GOLD layer Tables ---------------------
