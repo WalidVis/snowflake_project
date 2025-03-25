@@ -22,9 +22,10 @@ QUERY_WAREHOUSE = '{{ ENVIRONMENT }}_WH'
 
 -- To execute a notebook, you must add a live version to it first.
 -- L’exemple suivant définit la version LAST actuelle de my_notebook sur la version LIVE :
+-- https://docs.snowflake.com/fr/sql-reference/sql/alter-notebook
 
  ALTER NOTEBOOK BRONZE_LAYER.INGEST_RAW_FILES_INTO_BRONZE_LAYER ADD LIVE VERSION FROM LAST;
- ALTER NOTEBOOK BRONZE_LAYER.INGEST_RAW_FILES_INTO_BRONZE_LAYER COMMIT;
+ALTER NOTEBOOK BRONZE_LAYER.INGEST_INTO_SILVER_LAYER ADD LIVE VERSION FROM LAST;
 
 
 REMOVE @raw_layer.landing_internal_stage/staged_notebooks
