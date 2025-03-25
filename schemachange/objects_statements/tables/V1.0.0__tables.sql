@@ -314,7 +314,7 @@ CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_
     SyrusMarketCode VARCHAR NOT NULL,
     PricingMarketCode VARCHAR NOT NULL,
     SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
-    PRIMARY KEY (PricingCustomerErpPricingMarketPrcIntKey)
+    PRIMARY KEY (PricingSyrusMarketNonErpPricingMarketPrcIntKey)
 );
 
 
