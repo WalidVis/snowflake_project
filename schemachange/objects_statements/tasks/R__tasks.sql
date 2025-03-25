@@ -249,7 +249,6 @@ create or replace task BRONZE_LAYER.ingest_prc_pricing_market_json
 	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
 
 
-SELECT * from PRC_PRICING_MARKET_BRZ;
 
 create or replace task BRONZE_LAYER.ingest_prc_pricing_market_json_silver
 	warehouse={{ ENVIRONMENT}}_WH
