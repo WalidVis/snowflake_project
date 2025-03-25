@@ -138,7 +138,7 @@ CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_PRODUCT_BRZ (
   IDProduct VARCHAR not null,
   IDProductName VARCHAR,
   SYS_SOURCE_DATE VARCHAR,
-  Size NUMBER,
+  Size VARCHAR,
   Source VARCHAR,
   CREATE_DATE TIMESTAMP_LTZ COMMENT 'valued with Copy into command metadata',
   file_name VARCHAR COMMENT 'valued with Copy into command metadata',
@@ -174,7 +174,7 @@ create or replace TABLE BRONZE_LAYER.PRC_CAMPAIGN_BRZ (
 
 CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_BRZ
 (
-  HouseKey VARCHAR not null,
+  HouseKey VARCHAR,
   SyrusMarketCode VARCHAR not null,
   PricingMarketCode VARCHAR not null,
   SYS_SOURCE_DATE VARCHAR,
