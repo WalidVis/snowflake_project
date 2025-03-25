@@ -19,4 +19,12 @@ QUERY_WAREHOUSE = '{{ ENVIRONMENT }}_WH'
   COMMENT = 'Notebook to ingest data from bronze tables to silver layer tables';
 
 
+
+-- To execute a notebook, you must add a live version to it first.
+-- L’exemple suivant définit la version LAST actuelle de my_notebook sur la version LIVE :
+
+ ALTER NOTEBOOK BRONZE_LAYER.INGEST_RAW_FILES_INTO_BRONZE_LAYER ADD LIVE VERSION FROM LAST;
+ ALTER NOTEBOOK BRONZE_LAYER.INGEST_RAW_FILES_INTO_BRONZE_LAYER COMMIT;
+
+
 REMOVE @raw_layer.landing_internal_stage/staged_notebooks
