@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------
-   File Name: V1.1.1__initial_objects.sql
+   File Name: V1.0.0__tables.sql
    Description: 
        This SQL script sets up the initial objects required Snowflake project, 
        including stages. 
@@ -13,55 +13,33 @@
 
    Objects Created:
        1. Stages:
-           - product_data
-           - location_data
-           - sales_data
+           - LANDING_INTERNAL_STAGE
+           - ERROR_INTERNAL_STAGE
+           - ARCHIVE_INTERNAL_STAGE
 
        2. Pipes :
-           - STG_LOCATION_PP / STG_PRODUCT_PP / STG_SALES_PP
+           - 
 
        3. Tables:
-           - STG_LOCATION_RAW / STG_PRODUCT_RAW / STG_SALES_RAW
-           - STG_LOCATION / STG_PRODUCT / STG_SALES   (after cleansing)
+           - 
+           -
         
         4. Streams :
-           - STG_LOCATION_STRM / STG_PRODUCT_STRM / STG_SALES_STRM (Keeps track of changes in STG_X_RAW tables)
+           - 
 
-        5. Tasks:
-           - STG_LOCATION_TSK / STG_PRODUCT_TSK / STG_SALES_TSK  (move data from tables STG_X_RAW to STG_X based on a stream)
-        
         6. Views:
-           - STG_LOCATION_VIEW / STG_PRODUCT_VIEW / STG_SALES_VIEW  (Reference streams present in the raw_dtv schema)
-
-    Schema: 
-       raw_dtv
-
-   Objects Created:
-
-       1. Tables:
-           - HUB_LOCATION
-           - HUB_PRODUCT
-
-        2. Streams :
-           - LOCATION_OUTBOUND_STRM / PRODUCT_OUTBOUND_STRM / SALES_OUTBOUND_STRM (Keeps track of changes in STG_X tables)
-        
-        3. Tasks :
-           - LOCATION_STRM_TSK / PRODUCT_STRM_TSK / SALES_STRM_TSK ( Tasks to orchestrate movement from staging to raw_dtv , se basant sur les vues dans STAGING)
-
+           - 
 
 ------------------------------------------------------------------------------- */
 
 -------------------------------------------- Create stages ---------------------
+
 create stage if not exists RAW_LAYER.ARCHIVE_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
 create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
 create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
-create or replace stage RAW_LAYER.EXTERNAL_AZUR_STAGE
-      URL = 'azure://viseomdpdevsnowflakeproj.blob.core.windows.net/source-test'
-     CREDENTIALS = ( AZURE_SAS_TOKEN = 'sp=racwdlmeop&st=2025-02-25T08:40:42Z&se=2026-04-18T15:40:42Z&spr=https&sv=2022-11-02&sr=c&sig=5Q4x2IiL71%2FhP31RYDV4ryUcsy978h1qGPnwDBied3M%3D'  )
-    DIRECTORY = ( ENABLE = true );
 
 
  -------------------------------------------- Create staging BRONZE layer Tables ---------------------
@@ -156,7 +134,18 @@ create or replace TABLE BRONZE_LAYER.PRC_CAMPAIGN_BRZ (
 );
 
 
- -------------------------------------------- Create staging SILVER layer Tables ---------------------
+CREATE OR REPLACE TABLE BRONZE_LAYER.PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_BRZ
+(
+  HouseKey VARCHAR not null,
+  SyrusMarketCode VARCHAR not null,
+  PricingMarketCode VARCHAR not null,
+  SYS_SOURCE_DATE VARCHAR,
+  CREATE_DATE TIMESTAMP_LTZ COMMENT 'valued with Copy into command metadata',
+  file_name VARCHAR COMMENT 'valued with Copy into command metadata',
+  PRIMARY KEY(HouseKey, SyrusMarketCode, PricingMarketCode)
+);
+
+ -------------------------------------------- Create SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
 
@@ -227,7 +216,20 @@ create or replace TABLE SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV (
 );
 
 
- -------------------------------------------- Create staging GOLD layer Tables ---------------------
+
+CREATE OR REPLACE TABLE SILVER_LAYER.DIM_PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_SLV(
+    PricingSyrusMarketNonErpPricingMarketPrcIntKey NUMBER	NOT NULL,
+    PricingSyrusMarketNonErpPricingMarketPrcKey VARCHAR NOT NULL,
+    HouseKey VARCHAR NOT NULL,
+    SyrusMarketCode VARCHAR NOT NULL,
+    PricingMarketCode VARCHAR NOT NULL,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
+    PRIMARY KEY (PricingCustomerErpPricingMarketPrcIntKey)
+);
+
+
+
+ -------------------------------------------- Create GOLD layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
 

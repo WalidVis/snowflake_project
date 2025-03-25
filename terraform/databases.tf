@@ -41,7 +41,7 @@ resource "snowflake_schema" "raw_layer" {
 
 resource "snowflake_grant_privileges_to_account_role" "schema_grant_raw" {
   provider          = snowflake.security_admin
-  privileges        = ["USAGE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK", "CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE"]
+  privileges        = ["USAGE", "CREATE EXTERNAL TABLE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK", "CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE"]
   account_role_name = snowflake_account_role.role.name
   on_schema {
     schema_name = "\"${snowflake_database.db.name}\".\"${snowflake_schema.raw_layer.name}\""
