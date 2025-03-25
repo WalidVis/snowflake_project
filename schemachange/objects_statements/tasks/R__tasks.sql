@@ -127,23 +127,23 @@ ALTER TASK BRONZE_LAYER.ingest_prc_customer_erp_pricing_market_json RESUME;
 --------------------------------------------------------------------------
 ---------------------------------------------------
 
-create or replace task BRONZE_LAYER.ingest_prc_generic_geography_csv
+create or replace task BRONZE_LAYER.ingest_prc_generic_geography_json
 	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 0 5 * * * Europe/Paris'
-	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_GENERIC_GEOGRAPHY/\\", \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.csv_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_GENERIC_GEOGRAPHY_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_GENERIC_GEOGRAPHY_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingGenericGeographyPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingGenericGeographyPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(AGUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(AGUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_GENERIC_GEOGRAPHY/\\", \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_GENERIC_GEOGRAPHY_BRZ\\",  \\"silver_table\\" :\\"silver_layer.DIM_PRC_GENERIC_GEOGRAPHY_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingGenericGeographyPrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingGenericGeographyPrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(COALESCE(REPLACE(AGUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\", \\"silver_ruleFunctionalKey\\" : \\"COALESCE(REPLACE(AGUKCODE, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')\\"}''"}'
 	as EXECUTE IMMEDIATE $$ 
 	 BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
 
-ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_csv SUSPEND;
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_json SUSPEND;
 
 create or replace task BRONZE_LAYER.ingest_prc_generic_geography_silver
 	warehouse={{ ENVIRONMENT}}_WH
-	after BRONZE_LAYER.ingest_prc_generic_geography_csv
+	after BRONZE_LAYER.ingest_prc_generic_geography_json
 	as EXECUTE IMMEDIATE $$ 
 	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
 
 ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_silver RESUME;
-ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_csv RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_geography_json RESUME;
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -156,16 +156,16 @@ create or replace task BRONZE_LAYER.ingest_prc_generic_product_json
 	as EXECUTE IMMEDIATE $$ 
 	 BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
 
-ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_csv SUSPEND;
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_json SUSPEND;
 
 create or replace task BRONZE_LAYER.ingest_prc_generic_product_silver
 	warehouse={{ ENVIRONMENT}}_WH
-	after BRONZE_LAYER.ingest_prc_generic_product_csv
+	after BRONZE_LAYER.ingest_prc_generic_product_json
 	as EXECUTE IMMEDIATE $$ 
 	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
 
 ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_silver RESUME;
-ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_csv RESUME;
+ALTER TASK BRONZE_LAYER.ingest_prc_generic_product_json RESUME;
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
