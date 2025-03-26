@@ -40,7 +40,14 @@ create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE DIRECTORY = ( ENABL
 
 create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
+------------------------------------------------------------------------------- */
 
+-------------------------------------------- Create STREAMS ---------------------
+
+create or replace stream SILVER_LAYER.stream_DIM_PRC_GEOGRAPHY_SLV on table SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV;
+create or replace stream SILVER_LAYER.stream_DIM_GENERIC_GEOGRAPHY_SLV on table SILVER_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_SLV;
+create or replace stream SILVER_LAYER.stream_DIM_PRC_GENERIC_PRODUCT_SLV on table SILVER_LAYER.DIM_PRC_GENERIC_PRODUCT_SLV;
+create or replace stream SILVER_LAYER.stream_DIM_PRC_PRODUCT_SLV on table SILVER_LAYER.DIM_PRC_PRODUCT_SLV;
 
  -------------------------------------------- Create staging BRONZE layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
@@ -216,6 +223,34 @@ create or replace TABLE BRONZE_LAYER.PRC_PRICING_MARKET_BRZ (
 	primary key (HouseKey , PricingMarketCode )
 );
 
+
+create or replace TABLE BRONZE_LAYER.PRC_RETAIL_PRICE_BRZ (
+    PanelistSource	VARCHAR,
+    HouseKey	VARCHAR,
+    PriceCollectionLine	VARCHAR,
+    IDProduct	VARCHAR,
+    IDGeo	VARCHAR,
+    APUKCode	VARCHAR,
+    AGUKCode	VARCHAR,
+    APUKShortName	VARCHAR,
+    AGUKShortName	VARCHAR,
+    CollectedDate	VARCHAR,
+    LoadedDate	VARCHAR,
+    PriceType	VARCHAR,
+    Price	VARCHAR,
+    Currency	VARCHAR,
+    EAN	VARCHAR,
+    Size	VARCHAR,
+    Unit	VARCHAR,
+    PictureUrl	VARCHAR,
+    ProductPageURL	VARCHAR,
+    SYS_SOURCE_DATE	VARCHAR,
+    CREATE_DATE TIMESTAMP_LTZ, -- valued with copy into command metadata
+    file_name VARCHAR, -- valued with copy into command metadata
+	primary key (PanelistSource , HouseKey, PriceCollectionLine, CollectedDate )
+);
+
+
  -------------------------------------------- Create SILVER layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
@@ -381,6 +416,34 @@ create or replace TABLE SILVER_LAYER.DIM_PRC_PRICING_MARKET_SLV (
     LastEvolution VARCHAR,
     SYS_DATE_CREATE TIMESTAMP_LTZ,
 	primary key (PricingMarketPrcIntKey)
+);
+
+
+create or replace TABLE SILVER_LAYER.FACT_PRC_RETAIL_PRICE_SLV (
+    PricingRetailPricePrcIntKey	NUMBER,
+    PricingRetailPricePrcKey	VARCHAR,
+    PanelistSource	VARCHAR,
+    HouseKey	VARCHAR,
+    PriceCollectionLine	VARCHAR,
+    IDProduct	VARCHAR,
+    IDGeo	VARCHAR,
+    APUKCode	VARCHAR,
+    AGUKCode	VARCHAR,
+    APUKShortName	VARCHAR,
+    AGUKShortName	VARCHAR,
+    CollectedDate	DATE,
+    LoadedDate	DATE,
+    PriceType	VARCHAR,
+    Price	NUMBER,
+    Currency	VARCHAR,
+    EAN	VARCHAR,
+    Size	VARCHAR,
+    Unit	VARCHAR,
+    PictureUrl	VARCHAR,
+    ProductPageURL	VARCHAR,
+    SYS_SOURCE_DATE	TIMESTAMP_LTZ,
+    SYS_DATE_CREATE	TIMESTAMP_LTZ,
+    PRIMARY KEY (PricingRetailPricePrcIntKey)
 );
 
 
