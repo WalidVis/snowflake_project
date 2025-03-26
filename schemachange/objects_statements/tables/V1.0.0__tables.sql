@@ -40,14 +40,7 @@ create stage if not exists  RAW_LAYER.LANDING_INTERNAL_STAGE DIRECTORY = ( ENABL
 
 create stage if not exists  RAW_LAYER.ERROR_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
 
-------------------------------------------------------------------------------- */
 
--------------------------------------------- Create STREAMS ---------------------
-
-create or replace stream SILVER_LAYER.stream_DIM_PRC_GEOGRAPHY_SLV on table SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV;
-create or replace stream SILVER_LAYER.stream_DIM_GENERIC_GEOGRAPHY_SLV on table SILVER_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_SLV;
-create or replace stream SILVER_LAYER.stream_DIM_PRC_GENERIC_PRODUCT_SLV on table SILVER_LAYER.DIM_PRC_GENERIC_PRODUCT_SLV;
-create or replace stream SILVER_LAYER.stream_DIM_PRC_PRODUCT_SLV on table SILVER_LAYER.DIM_PRC_PRODUCT_SLV;
 
  -------------------------------------------- Create staging BRONZE layer Tables ---------------------
 -----------------------------------------------------------------------------------------------------
@@ -523,3 +516,18 @@ create or replace file format BRONZE_LAYER.json_file_format
 ;
 
 
+
+
+------------------------------------------------------------------------------- */
+
+-------------------------------------------- Create STREAMS ---------------------
+
+ALTER TABLE SILVER_LAYER.DIM_PRC_GENERIC_PRODUCT_SLV SET CHANGE_TRACKING = TRUE;
+ALTER TABLE SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV SET CHANGE_TRACKING = TRUE;
+ALTER TABLE SILVER_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_SLV SET CHANGE_TRACKING = TRUE;
+ALTER TABLE SILVER_LAYER.DIM_PRC_PRODUCT_SLV SET CHANGE_TRACKING = TRUE;
+
+create or replace stream SILVER_LAYER.stream_DIM_PRC_GEOGRAPHY_SLV on table SILVER_LAYER.DIM_PRC_GEOGRAPHY_SLV;
+create or replace stream SILVER_LAYER.stream_DIM_GENERIC_GEOGRAPHY_SLV on table SILVER_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_SLV;
+create or replace stream SILVER_LAYER.stream_DIM_PRC_GENERIC_PRODUCT_SLV on table SILVER_LAYER.DIM_PRC_GENERIC_PRODUCT_SLV;
+create or replace stream SILVER_LAYER.stream_DIM_PRC_PRODUCT_SLV on table SILVER_LAYER.DIM_PRC_PRODUCT_SLV;
