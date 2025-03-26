@@ -267,11 +267,10 @@ ALTER TASK BRONZE_LAYER.ingest_prc_pricing_market_json RESUME;
 create or replace task BRONZE_LAYER.ingest_prc_retail_price_json
 	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 1 * * * * Europe/Paris'
-	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_RETAIL_PRICE/\\", \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_RETAIL_PRICE_BRZ\\",  \\"silver_table\\" :\\"silver_layer.TEST_DIM_PRC_BENCHMARK_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingRetailPricePrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingRetailPricePrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(COALESCE(REPLACE(PanelistSource, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(HouseKey, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''') , ''\\\\''_\\\\'''', COALESCE(REPLACE(PriceCollectionLine, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(APUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''),  ''\\\\''_\\\\'''', COALESCE(REPLACE(AGUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CollectedDate, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')))\\", \\"silver_ruleFunctionalKey\\" : \\"CONCAT(COALESCE(REPLACE(PanelistSource, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(HouseKey, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''') , ''\\\\''_\\\\'''', COALESCE(REPLACE(PriceCollectionLine, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(APUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''') , ''\\\\''_\\\\'''', COALESCE(REPLACE(AGUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CollectedDate, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\" }''"}'
+	config='{"params":"''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_RETAIL_PRICE/\\", \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_RETAIL_PRICE_BRZ\\",  \\"silver_table\\" :\\"silver_layer.FACT_PRC_RETAIL_PRICE_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingRetailPricePrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingRetailPricePrcKey\\", \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(COALESCE(REPLACE(PanelistSource, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(HouseKey, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''') , ''\\\\''_\\\\'''', COALESCE(REPLACE(PriceCollectionLine, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(APUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''),  ''\\\\''_\\\\'''', COALESCE(REPLACE(AGUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CollectedDate, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')))\\", \\"silver_ruleFunctionalKey\\" : \\"CONCAT(COALESCE(REPLACE(PanelistSource, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(HouseKey, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''') , ''\\\\''_\\\\'''', COALESCE(REPLACE(PriceCollectionLine, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(APUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''') , ''\\\\''_\\\\'''', COALESCE(REPLACE(AGUKCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CollectedDate, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\" }''"}'
 	WHEN SYSTEM$STREAM_HAS_DATA('SILVER_LAYER.stream_DIM_PRC_GEOGRAPHY_SLV') and SYSTEM$STREAM_HAS_DATA('SILVER_LAYER.stream_DIM_GENERIC_GEOGRAPHY_SLV') 
     and SYSTEM$STREAM_HAS_DATA('SILVER_LAYER.stream_DIM_PRC_GENERIC_PRODUCT_SLV') and SYSTEM$STREAM_HAS_DATA('SILVER_LAYER.stream_DIM_PRC_PRODUCT_SLV') 
-    as EXECUTE IMMEDIATE $$ 
-	BEGIN
+    as BEGIN
     
     --Purge the streams
     CREATE OR REPLACE TEMPORARY TABLE RESET_STREAM_TBL AS SELECT * FROM SILVER_LAYER.stream_DIM_PRC_GEOGRAPHY_SLV;
@@ -280,14 +279,17 @@ create or replace task BRONZE_LAYER.ingest_prc_retail_price_json
     CREATE OR REPLACE TEMPORARY TABLE RESET_STREAM_TBL AS SELECT * FROM SILVER_LAYER.stream_DIM_PRC_PRODUCT_SLV;
     
     LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string;
-    EXECUTE NOTEBOOK "TEST_POC_VISEO_DB"."BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
+    EXECUTE NOTEBOOK "TEST_POC_VISEO_DB"."BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;
 
 	ALTER TASK BRONZE_LAYER.ingest_prc_retail_price_json SUSPEND;
 
-create or replace task BRONZE_LAYER.INGEST_FACT_RETAIL_PRICE_SILVER
-	warehouse=TEST_WH
-	after BRONZE_LAYER.ingest_prc_retail_price_json
-	as EXECUTE IMMEDIATE $$ LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_FACT_RETAIL_INTO_SILVER"();$$;
-	
+createor replace task BRONZE_LAYER.INGEST_FACT_RETAIL_PRICE_SILVER 
+warehouse ={{ ENVIRONMENT}}_WH
+after
+  BRONZE_LAYER.INGEST_PRC_RETAIL_PRICE_JSON as EXECUTE IMMEDIATE $$ 
+  BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string;
+EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_FACT_RETAIL_INTO_SILVER"(:PARAMS); END;
+$$;
+
 ALTER TASK BRONZE_LAYER.INGEST_FACT_RETAIL_PRICE_SILVER RESUME;
 ALTER TASK BRONZE_LAYER.ingest_prc_retail_price_json RESUME;
