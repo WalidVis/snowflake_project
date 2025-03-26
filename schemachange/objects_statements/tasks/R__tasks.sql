@@ -300,15 +300,15 @@ ALTER TASK BRONZE_LAYER.ingest_prc_retail_price_json RESUME;
 ---------------------------------------------------
 --------------------------------------------------------------------------
 ---------------------------------------------------
-create or replace task DEV_POC_VISEO_DB.BRONZE_LAYER.INGEST_PRC_HOUSE_PRICE_BRZ_JSON
+create or replace task BRONZE_LAYER.INGEST_PRC_HOUSE_PRICE_BRZ_JSON
 	warehouse={{ ENVIRONMENT}}_WH
 	schedule='USING CRON 0 5 * * * Europe/Paris'
 	config='{"params":"     ''{ \\"src_schema\\" : \\"raw_layer\\", \\"external_stage_root_path\\": \\"@RAW_LAYER.EXTERNAL_AZUR_STAGE/Files\\", \\"stage_name\\": \\"@raw_layer.landing_internal_stage\\",  \\"stage_path_suffix\\" :\\"/PRC_DATA_PRC_HOUSE_PRICE/\\", \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"bronze_layer.json_file_format\\",  \\"bronze_table\\": \\"bronze_layer.PRC_HOUSE_PRICE_BRZ\\",  \\"silver_table\\" :\\"silver_layer.PRICING_FACT_HOUSE_PRICE_PRC_SLV\\", \\"silver_technicalKey_name\\" : \\"PricingHousePricePrcIntKey\\", \\"silver_functionalKey_name\\" : \\"PricingHousePricePrcKey\\",     \\"silver_ruleTechnicalKey\\": \\"HASH(CONCAT(     COALESCE(REPLACE(HouseKey, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(CampaignCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(PricingMarketCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\'''')))\\",      \\"silver_ruleFunctionalKey\\" : \\"CONCAT(     COALESCE(REPLACE(CampaignCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(PricingMarketCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''), ''\\\\''_\\\\'''', COALESCE(REPLACE(PricingRefCode, ''\\\\''\\\\ \\\\'''', ''\\\\''\\\\''''), ''\\\\''N/A\\\\''''))\\"}''"}'
 	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "BRONZE_LAYER"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
 
-create or replace task DEV_POC_VISEO_DB.BRONZE_LAYER.INGEST_PRICING_FACT_HOUSE_PRICE_PRC_SLV_JSON
-	warehouse=DEV_WH
-	after DEV_POC_VISEO_DB.BRONZE_LAYER.INGEST_PRC_HOUSE_PRICE_BRZ_JSON
+create or replace task BRONZE_LAYER.INGEST_PRICING_FACT_HOUSE_PRICE_PRC_SLV_JSON
+	warehouse={{ ENVIRONMENT}}_WH
+	after BRONZE_LAYER.INGEST_PRC_HOUSE_PRICE_BRZ_JSON
 	as EXECUTE IMMEDIATE $$ 
 	BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "SILVER_LAYER"."INGEST_INTO_SILVER_LAYER"(:PARAMS); END;$$;
 
