@@ -31,7 +31,9 @@
            - 
 
 ------------------------------------------------------------------------------- */
-
+/* WARNING : CREATE EXTERNAL STAGE IN RAW_LAYER : "EXTERNAL_AZUR_STAGE" 
+USE Blob URL : azure://viseomdpdevsnowflakeproj.blob.core.windows.net/source-test/Files/
+SAS Token -> See with Issam / Achref */
 -------------------------------------------- Create stages ---------------------
 
 create stage if not exists RAW_LAYER.ARCHIVE_INTERNAL_STAGE DIRECTORY = ( ENABLE = true );
@@ -369,7 +371,7 @@ create or replace TABLE SILVER_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_SLV (
 	PricingGenericGeographyPrcIntKey NUMBER NOT NULL,
 	PricingGenericGeographyPrcKey VARCHAR NOT NULL,
 	AgukCode VARCHAR NOT NULL,
-	AgukShortName VARCHAR,
+	ShortName VARCHAR,
 	DistributionChannel VARCHAR,
     Touchpoint VARCHAR,
     ISOCountryCode VARCHAR,
