@@ -1,13 +1,13 @@
 [TEST]
-account = "ZYMTTIF-LX92250"
-user = "ADMIN_USER"
+account = "HIRRXJE-MR52232"
+user = "SNOWVISEOADMIN"
 database = "TEST_POC_VISEO_DB"
 role = "TEST_POC_VISEO_ROLE"
 warehouse = "TEST_WH"
 
 [DEV]
-account = "ZYMTTIF-LX92250"
-user = "ADMIN_USER"
+account = "HIRRXJE-MR52232"
+user = "SNOWVISEOADMIN"
 database = "DEV_POC_VISEO_DB"
 role = "DEV_POC_VISEO_ROLE"
 warehouse = "DEV_WH"

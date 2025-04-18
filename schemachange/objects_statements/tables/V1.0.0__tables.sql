@@ -369,7 +369,7 @@ create or replace TABLE SILVER_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_SLV (
 	PricingGenericGeographyPrcIntKey NUMBER NOT NULL,
 	PricingGenericGeographyPrcKey VARCHAR NOT NULL,
 	AgukCode VARCHAR NOT NULL,
-	ShortName VARCHAR,
+	AgukShortName VARCHAR,
 	DistributionChannel VARCHAR,
     Touchpoint VARCHAR,
     ISOCountryCode VARCHAR,
@@ -566,6 +566,19 @@ CREATE or replace TABLE SILVER_LAYER.PRICING_FACT_HOUSE_PRICE_PRC (
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
 
+create or replace TABLE GOLD_LAYER.DIM_PRC_BENCHMARK_GLD (
+	PrcPcsBenchmarkIntKey NUMBER NOT NULL PRIMARY KEY,
+    PrcPcsGenericProductIntKey NUMBER NOT NULL,
+	APUKCode VARCHAR NOT NULL,
+	SKUGroup VARCHAR,
+	Anabench2 VARCHAR,
+    Anabench1 VARCHAR,
+	HouseCode VARCHAR,
+    SYS_SOURCE_DATE TIMESTAMP_LTZ,
+	SYS_DATE_CREATE TIMESTAMP_LTZ,
+	SYS_DATE_UPDATE TIMESTAMP_LTZ NOT NULL
+);
+
 CREATE OR REPLACE TABLE GOLD_LAYER.DIM_PRC_CAMPAIGN_MARKET_GLD(
     PrcPcsCampaignMarketIntKey NUMBER NOT NULL PRIMARY KEY,
     HouseKey VARCHAR NOT NULL,
@@ -588,6 +601,21 @@ CREATE OR REPLACE TABLE GOLD_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_GLD(
     SYS_SOURCE_DATE	TIMESTAMP_LTZ,
     SYS_DATE_CREATE	TIMESTAMP_LTZ NOT NULL,
     SYS_DATE_UPDATE	TIMESTAMP NOT NULL
+);
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_GLD (
+	PrcPcsGenericGeographyIntKey NUMBER NOT NULL PRIMARY KEY,
+	AGUKCode VARCHAR NOT NULL,
+    AGUKShortName VARCHAR,
+    DistributionChannel VARCHAR,
+	Touchpoint VARCHAR,
+	ISOCountryCode VARCHAR,
+    AreaKey VARCHAR,
+    AreaName VARCHAR,
+	AgukCreationDate DATE,
+    SYS_SOURCE_DATE TIMESTAMP_LTZ
+	SYS_DATE_CREATE TIMESTAMP_LTZ,
+	SYS_DATE_UPDATE TIMESTAMP_LTZ NOT NULL
 );
 
 
