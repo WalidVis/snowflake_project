@@ -117,4 +117,20 @@ resource "snowflake_grant_privileges_to_account_role" "executetask" {
   on_account        = true
 
 }
+
+resource "snowflake_schema" "orchestration_schema" {
+  provider            = snowflake.sys_admin
+  database            = snowflake_database.db.name
+  name                = "ORCHESTRATION_SCHEMA"
+  with_managed_access = false
+}
+
+resource "snowflake_grant_privileges_to_account_role" "schema_grant_orchestration" {
+  provider          = snowflake.security_admin
+  privileges        = ["USAGE", "CREATE TABLE", "CREATE VIEW", "CREATE PROCEDURE", "CREATE NOTEBOOK", "CREATE STAGE", "CREATE FILE FORMAT", "CREATE TASK", "CREATE STREAM", "CREATE PIPE", "CREATE SEQUENCE"]
+  account_role_name = snowflake_account_role.role.name
+  on_schema {
+    schema_name = "\"${snowflake_database.db.name}\".\"${snowflake_schema.orchestration_schema.name}\""
+  }
+}
  

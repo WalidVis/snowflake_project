@@ -1,0 +1,172 @@
+/* ------------------------------------------------------------------------------
+   File Name: 
+       V4.0.0__gold_tables.sql
+
+   Authors:
+       Matthieu NOIRET
+
+   Description: 
+       This SQL script sets up the gold tables for the Snowflake Project. 
+
+   Schemas: 
+       GOLD_LAYER
+
+   Objects Created:
+       1. Tables:
+           - DIM_PRC_BENCHMARK_GLD
+           - DIM_PRC_CAMPAIGN_GLD
+           - DIM_PRC_CAMPAIGN_MARKET_GLD
+           - DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_GLD
+           - DIM_PRC_GENERIC_GEOGRAPHY_GLD
+           - DIM_PRC_GENERIC_PRODUCT_GLD
+           - DIM_PRC_GEOGRAPHY_GLD
+           - DIM_PRC_HOUSE_GLD
+           
+------------------------------------------------------------------------------- */
+
+------------------------------ Create GOLD Tables -----------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_BENCHMARK_GLD (
+	PRCPCSBENCHMARKINTKEY NUMBER(38,0) NOT NULL,
+	PRCPCSGENERICPRODUCTINTKEY NUMBER(38,0) NOT NULL,
+	APUKCODE VARCHAR NOT NULL,
+	SKUGROUP VARCHAR,
+	ANABENCH2 VARCHAR,
+	ANABENCH1 VARCHAR,
+	HOUSECODE VARCHAR,
+	SYS_SOURCE_DATE TIMESTAMP_LTZ(9),
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9),
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9) NOT NULL,
+	primary key (PRCPCSBENCHMARKINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_CAMPAIGN_GLD (
+	PRCPCSCAMPAIGNINTKEY NUMBER(38,0) NOT NULL,
+	HOUSEKEY VARCHAR NOT NULL,
+	CAMPAIGNCODE VARCHAR NOT NULL,
+	CAMPAIGNNAME VARCHAR,
+	CAMPAIGNDESCRIPTION VARCHAR,
+	HISTORICALSELLINFIRSTMONTH VARCHAR,
+	HISTORICALSELLINLASTMONTH VARCHAR,
+	CAMPAIGNDATE VARCHAR,
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9),
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9),
+	primary key (PRCPCSCAMPAIGNINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+  
+create or replace TABLE GOLD_LAYER.DIM_PRC_CAMPAIGN_MARKET_GLD (
+	PRCPCSCAMPAIGNMARKETINTKEY NUMBER(38,0) NOT NULL,
+	HOUSEKEY VARCHAR NOT NULL,
+	CAMPAIGNCODE VARCHAR NOT NULL,
+	PRICINGMARKETCODE VARCHAR NOT NULL,
+	RATETYPE VARCHAR,
+	RATEDATE DATE,
+	BASECAMPAIGNCODE VARCHAR,
+	SYS_SOURCE_DATE TIMESTAMP_LTZ(9),
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9),
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9) NOT NULL,
+	primary key (PRCPCSCAMPAIGNMARKETINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_CUSTOMER_ERP_PRICING_MARKET_GLD (
+	PRICINGCUSTOMERERPPRICINGMARKETPRCINTKEY NUMBER(38,0) NOT NULL,
+	HOUSEKEY VARCHAR NOT NULL,
+	CUSTOMERCODE VARCHAR NOT NULL,
+	PRICINGMARKETCODE VARCHAR NOT NULL,
+	SYS_SOURCE_DATE TIMESTAMP_LTZ(9),
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9) NOT NULL,
+	SYS_DATE_UPDATE TIMESTAMP_NTZ(9) NOT NULL,
+	primary key (PRICINGCUSTOMERERPPRICINGMARKETPRCINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_GENERIC_GEOGRAPHY_GLD (
+	PRCPCSGENERICGEOGRAPHYINTKEY NUMBER(38,0) NOT NULL,
+	AGUKCODE VARCHAR NOT NULL,
+	AGUKSHORTNAME VARCHAR,
+	DISTRIBUTIONCHANNEL VARCHAR,
+	TOUCHPOINT VARCHAR,
+	ISOCOUNTRYCODE VARCHAR,
+	AREAKEY VARCHAR,
+	AREANAME VARCHAR,
+	AGUKCREATIONDATE DATE,
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9),
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9) NOT NULL,
+	primary key (PRCPCSGENERICGEOGRAPHYINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_GENERIC_PRODUCT_GLD (
+	PRCPCSGENERICPRODUCTINTKEY NUMBER(38,0) NOT NULL,
+	APUKCODE VARCHAR NOT NULL,
+	APUKHOUSESWITCHCODE VARCHAR,
+	APUKHOUSESWITCHDATE DATE,
+	SHORTNAME VARCHAR,
+	ISINTERNAL BOOLEAN,
+	PRICINGREFCODE VARCHAR,
+	ISINNOVATION BOOLEAN,
+	SIZE VARCHAR,
+	UNIT VARCHAR,
+	PANELCOMMERCIALLINEKEY VARCHAR,
+	PANELSUBSEGMENTKEY VARCHAR,
+	ISACTIVE BOOLEAN,
+	LOGDESCRIPTION VARCHAR,
+	CREATIONDATE DATE,
+	COMMERCIALLINENAME VARCHAR,
+	FRANCHISENAME VARCHAR,
+	DIVISIONNAME VARCHAR,
+	CORPORATIONNAME VARCHAR,
+	SUBSEGMENTNAME VARCHAR,
+	SEGMENTNAME VARCHAR,
+	SUBCATEGORYNAME VARCHAR,
+	CATEGORYNAME VARCHAR,
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9) NOT NULL,
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9) NOT NULL,
+	primary key (PRCPCSGENERICPRODUCTINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_GEOGRAPHY_GLD (
+	PRCPCSGEOGRAPHYINTKEY NUMBER(38,0) NOT NULL,
+	IDGEO VARCHAR NOT NULL,
+	IDGEONAME VARCHAR,
+	AGUKCODE VARCHAR,
+	SOURCE VARCHAR,
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9),
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9) NOT NULL,
+	primary key (PRCPCSGEOGRAPHYINTKEY)
+);
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace TABLE GOLD_LAYER.DIM_PRC_HOUSE_GLD (
+	PRCPCSHOUSEINTKEY NUMBER(38,0) NOT NULL,
+	HOUSEKEY VARCHAR NOT NULL,
+	HOUSENAME VARCHAR,
+	SYS_DATE_CREATE TIMESTAMP_LTZ(9),
+	SYS_DATE_UPDATE TIMESTAMP_LTZ(9) NOT NULL,
+	primary key (PRCPCSHOUSEINTKEY)
+);
