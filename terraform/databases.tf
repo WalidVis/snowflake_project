@@ -133,4 +133,3 @@ resource "snowflake_grant_privileges_to_account_role" "schema_grant_orchestratio
     schema_name = "\"${snowflake_database.db.name}\".\"${snowflake_schema.orchestration_schema.name}\""
   }
 }
- 
