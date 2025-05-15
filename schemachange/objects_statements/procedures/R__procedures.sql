@@ -20,110 +20,129 @@
 
 -------------------------------------------- Create Procedures ---------------------
 
-CREATE OR REPLACE PROCEDURE ORCHESTRATION_SCHEMA.INGEST_FILE_PROC("SRC_SCHEMA" VARCHAR, "TARGET_TABLE_ABS_NAME" VARCHAR, "STAGE_NAME" VARCHAR, "STAGE_SUFFIX_DIRECTORY_PATH" VARCHAR, "PATTERN_FILE_NAME" VARCHAR, "FILE_FORMAT" VARCHAR, "ON_ERROR_OPTION" VARCHAR)
+CREATE OR REPLACE PROCEDURE ORCHESTRATION_SCHEMA.INGEST_FILE_PROC("BRONZE_TABLE_NAME" VARCHAR)
 RETURNS TABLE ()
 LANGUAGE SQL
 EXECUTE AS CALLER
-AS 'DECLARE
-    landing_directory_abs_path VARCHAR ;
+AS '
+DECLARE
+    file_format VARCHAR;
+    snowflake_file_format VARCHAR;
+    builded_file_name VARCHAR;
+    stage_suffix_directory_path VARCHAR DEFAULT ''/'' || :BRONZE_TABLE_NAME || ''/'';
+    src_schema VARCHAR DEFAULT ''raw_layer'';
+    stage_name VARCHAR DEFAULT ''@raw_layer.landing_internal_stage'';
+    pattern_file_name VARCHAR;
+    on_error_option VARCHAR DEFAULT ''CONTINUE'';
+
+    landing_directory_abs_path VARCHAR;
     archive_abs_path VARCHAR;
     error_abs_path VARCHAR;
+    layer VARCHAR(30) DEFAULT ''BRONZE_LAYER'';
+    monitoring_table_name VARCHAR DEFAULT ''monitoring_layer.monitoring_ingest'';
     query_result RESULTSET DEFAULT (SELECT -1);
     query VARCHAR;
-    layer VARCHAR(30) DEFAULT ''\\''BRONZE_LAYER\\'''';
-    monitoring_table_name VARCHAR := ''monitoring_layer.monitoring_ingest'';
-    builded_file_name VARCHAR := stage_suffix_directory_path || pattern_file_name ;
+    dateTime DATETIME DEFAULT CURRENT_TIMESTAMP();
 
 BEGIN
-    
-    let dateTime DATETIME := CURRENT_TIMESTAMP();
-    
+    -- Récupération du FILE_FORMAT depuis la table de paramétrage
+    SELECT FILE_FORMAT
+    INTO :file_format
+    FROM ORCHESTRATION_SCHEMA.TABLE_NAMES_MANPRM
+    WHERE TABLE_NAME = :BRONZE_TABLE_NAME;
+
+    -- Déduction du format Snowflake à utiliser
+    SELECT CASE FILE_FORMAT
+         WHEN ''CSV'' THEN ''bronze_layer.csv_file_format_semicolon''
+         WHEN ''JSON'' THEN ''bronze_layer.json_file_format''
+       END
+    INTO :snowflake_file_format
+    FROM ORCHESTRATION_SCHEMA.TABLE_NAMES_MANPRM
+    WHERE TABLE_NAME = :BRONZE_TABLE_NAME;
+
+    -- Construction des autres variables
+    pattern_file_name := ''.*.'' || LOWER(:file_format);
+    builded_file_name := stage_suffix_directory_path || pattern_file_name;
+
     landing_directory_abs_path := :stage_name || :stage_suffix_directory_path;
-    archive_abs_path := ''@'' || :src_schema || ''.'' || ''archive_internal_stage'' || :stage_suffix_directory_path;
-    error_abs_path := ''@'' || :src_schema || ''.'' || ''error_internal_stage'' || :stage_suffix_directory_path;
+    archive_abs_path := ''@'' || :src_schema || ''.archive_internal_stage'' || :stage_suffix_directory_path;
+    error_abs_path := ''@'' || :src_schema || ''.error_internal_stage'' || :stage_suffix_directory_path;
     
-    query := ''copy into '' || target_table_abs_name || '' from ''||  landing_directory_abs_path ||'' 
-        FILE_FORMAT = (FORMAT_NAME='' || file_format||'')
-        PATTERN = ''||''\\'''' || pattern_file_name ||''\\'' 
-        ON_ERROR = ''|| on_error_option ||'' 
+    query := ''COPY INTO '' || ''BRONZE_LAYER.'' || :BRONZE_TABLE_NAME || ''_BRZ'' || '' FROM '' || landing_directory_abs_path || ''
+        FILE_FORMAT = (FORMAT_NAME='''''' || snowflake_file_format || '''''')
+        PATTERN = '''''' || pattern_file_name || ''''''
+        ON_ERROR = '' || on_error_option || ''
         MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
         INCLUDE_METADATA = (create_date = METADATA$START_SCAN_TIME, file_name = METADATA$FILENAME)'';
-    
-    query_result := (execute immediate query);
-     
-    
-    FOR item IN query_result DO
-        let v_status varchar := item."status";
 
-        // Non existing file or already loaded 
-        IF (v_status != ''LOADED'' AND v_status != ''LOAD_FAILED'' AND v_status != ''PARTIALLY_LOADED'' ) THEN
-            
-            //copy files into :archive_file_abs_path from :landing_file_abs_path;
-            insert into monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', :v_status, 0, 0, CURRENT_TIMESTAMP(3), ''No files OR Files already loaded'');
-   
+    query_result := (EXECUTE IMMEDIATE :query);
+
+    FOR item IN query_result DO
+        LET v_status VARCHAR := item."status";
+
+        IF (v_status != ''LOADED'' AND v_status != ''LOAD_FAILED'' AND v_status != ''PARTIALLY_LOADED'') THEN
+            INSERT INTO monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)
+            VALUES(:builded_file_name, :layer, :v_status, 0, 0, CURRENT_TIMESTAMP(3), ''No files OR Files already loaded'');
             BREAK;
         END IF;
-        
-        let v_file_name varchar := COALESCE(item."file",''null'');
-        let v_rows_parsed number := item."rows_parsed";
-        let v_rows_loaded number := item."rows_loaded";
-        let v_errors_seen number := item."errors_seen";
-        let v_first_error varchar := COALESCE(item."first_error",''null'');
-        let v_first_error_line number := COALESCE(item."first_error_line", -1);
-        let  v_first_error_character number:= COALESCE(item."first_error_character", -1);
-        let v_first_error_column_name varchar := COALESCE(item."first_error_column_name",''null'');
-        v_first_error := (SELECT REPLACE(:v_first_error, '''''''', ''''));// Delete quotes in the string
 
-        // Write into monitoring table 
-         query := ''insert into ''|| monitoring_table_name ||''(file, layer, status, ingestion_time, rows_parsed, rows_loaded, errors_seen, first_error, first_error_line, first_error_character_position, first_error_column_name) 
-values(\\''''|| v_file_name ||''\\'', ''|| layer ||'', \\''''|| v_status || ''\\'', CURRENT_TIMESTAMP(3), '' || v_rows_parsed ||'', ''|| v_rows_loaded ||'', ''|| v_errors_seen ||'', \\''''|| v_first_error ||''\\'', ''|| v_first_error_line ||'', ''
-|| v_first_error_character ||'', \\'''' || v_first_error_column_name || ''\\'')'';
+        LET v_file_name VARCHAR := COALESCE(item."file", ''null'');
+        LET v_rows_parsed NUMBER := item."rows_parsed";
+        LET v_rows_loaded NUMBER := item."rows_loaded";
+        LET v_errors_seen NUMBER := item."errors_seen";
+        LET v_first_error VARCHAR := COALESCE(item."first_error", ''null'');
+        LET v_first_error_line NUMBER := COALESCE(item."first_error_line", -1);
+        LET v_first_error_character NUMBER := COALESCE(item."first_error_character", -1);
+        LET v_first_error_column_name VARCHAR := COALESCE(item."first_error_column_name", ''null'');
 
-         execute immediate query;
+        v_first_error := (SELECT REPLACE(:v_first_error, '''''''''''', ''''''''));
 
-        //Move source files with target directory depending on Copy ingestion result status
-        let  landing_file_abs_path := ''@'' || src_schema || ''.'' || v_file_name;
-        let dateTimeFormat VARCHAR := to_char(dateTime, ''YYYY-MM-DD-HH24:MI:SS'');
+        query := ''INSERT INTO '' || monitoring_table_name || ''(file, layer, status, ingestion_time, rows_parsed, rows_loaded, errors_seen, first_error, first_error_line, first_error_character_position, first_error_column_name)
+        VALUES('''''' || v_file_name || '''''', '''''' || layer || '''''', '''''' || v_status || '''''', CURRENT_TIMESTAMP(3), '' || v_rows_parsed || '', '' || v_rows_loaded || '', '' || v_errors_seen || '', '''''' || v_first_error || '''''', '' || v_first_error_line || '', '' || v_first_error_character || '', '''''' || v_first_error_column_name || '''''')'';
+
+        EXECUTE IMMEDIATE query;
+
+        LET landing_file_abs_path := ''@'' || src_schema || ''.'' || v_file_name;
+        LET dateTimeFormat VARCHAR := TO_CHAR(dateTime, ''YYYY-MM-DD-HH24:MI:SS'');
+
         IF (v_status = ''LOADED'') THEN
-            //copy files into :archive_abs_path from :archive_file_abs_path;
-            query := ''copy files into '' || archive_abs_path ||   dateTimeFormat ||  ''/'' ||'' from '' || landing_file_abs_path;
-            execute immediate query;
-        ELSE 
-            //copy files into :error_abs_path from :error_file_abs_path;
-            query := ''copy files into '' || error_abs_path  ||   dateTimeFormat ||  ''/'' || '' from '' || landing_file_abs_path;
-            execute immediate query;
+            query := ''COPY FILES INTO '' || archive_abs_path || dateTimeFormat || ''/'' || '' FROM '' || landing_file_abs_path;
+        ELSE
+            query := ''COPY FILES INTO '' || error_abs_path || dateTimeFormat || ''/'' || '' FROM '' || landing_file_abs_path;
         END IF;
 
-        
+        EXECUTE IMMEDIATE query;
+
     END FOR;
-  
-   //Remove files and directory
-   query := ''REMOVE '' || landing_directory_abs_path;
-   execute immediate query;
-   
-   RETURN TABLE(query_result);
-   
+
+    query := ''REMOVE '' || landing_directory_abs_path;
+    EXECUTE IMMEDIATE query;
+    
+    RETURN TABLE(query_result);
 
 EXCEPTION
-  WHEN statement_error THEN
-    query_result := (SELECT ''Statement_error'' as ERROR_TYPE, :sqlcode as SQL_CODE, :sqlerrm as ERROR_MESS , 
-    :sqlstate as STATE, ''FAILED'' as "status", :query as QUERY);
-    insert into monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :sqlerrm);
-    return table(query_result);
-  
-  WHEN EXPRESSION_ERROR THEN
-     query_result := (SELECT ''Expression_error'' as ERROR_TYPE, :sqlcode as SQL_CODE, :sqlerrm as ERROR_MESS,
-     :sqlstate as STATE, ''FAILED'' as "status", :query as QUERY);
-     insert into monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :sqlerrm);
-    return table(query_result);
-    
-  WHEN OTHER THEN
-    query_result := (SELECT ''Other'' as ERROR_TYPE, :sqlcode as SQL_CODE, :sqlerrm as ERROR_MESSAGE , 
-    :sqlstate as SQL_STATE, ''FAILED'' as "status", :query as QUERY);
-     insert into monitoring_layer.monitoring_ingest(file, layer, status,rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)  values(:builded_file_name, ''BRONZE_LAYER'', ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :sqlerrm);
-    return table(query_result);
+    WHEN STATEMENT_ERROR THEN
+        query_result := (SELECT ''Statement_error'' AS ERROR_TYPE, :SQLCODE AS SQL_CODE, :SQLERRM AS ERROR_MESS,
+                         :SQLSTATE AS STATE, ''FAILED'' AS "status", :query AS QUERY);
+        INSERT INTO monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)
+        VALUES(:builded_file_name, :layer, ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :SQLERRM);
+        RETURN TABLE(query_result);
 
-END';
+    WHEN EXPRESSION_ERROR THEN
+        query_result := (SELECT ''Expression_error'' AS ERROR_TYPE, :SQLCODE AS SQL_CODE, :SQLERRM AS ERROR_MESS,
+                         :SQLSTATE AS STATE, ''FAILED'' AS "status", :query AS QUERY);
+        INSERT INTO monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)
+        VALUES(:builded_file_name, :layer, ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :SQLERRM);
+        RETURN TABLE(query_result);
+
+    WHEN OTHER THEN
+        query_result := (SELECT ''Other'' AS ERROR_TYPE, :SQLCODE AS SQL_CODE, :SQLERRM AS ERROR_MESSAGE,
+                         :SQLSTATE AS SQL_STATE, ''FAILED'' AS "status", :query AS QUERY);
+        INSERT INTO monitoring_layer.monitoring_ingest(file, layer, status, rows_parsed, rows_loaded, ingestion_time, FIRST_ERROR)
+        VALUES(:builded_file_name, :layer, ''LOAD_FAILED'', 0, 0, CURRENT_TIMESTAMP(3), :SQLERRM);
+        RETURN TABLE(query_result);
+END;
+';
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
