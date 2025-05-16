@@ -98,4 +98,5 @@ create or replace TABLE ORCHESTRATION_SCHEMA.TABLE_NAMES_MANPRM (
 	SILVER_TABLE_NAME VARCHAR,
 	SILVER_TABLE_TECHNICAL_KEY_FIELDS VARCHAR COMMENT 'List each fields which make up the technical key in order separated by '',''',
 	SILVER_PRIMARY_KEY VARCHAR
-);
+)COMMENT='Parameters table used to parse arguments in multiple notebooks and stored procedures in the notebook, the data used to fill this table can be found on the github repo under the \"data\" folder (TABLE_NAMES_MANPRM.csv).'
+;
