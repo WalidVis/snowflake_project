@@ -14,7 +14,8 @@
 
    Objects Created:
        1. Tasks:
-           - PRICING_TRIGGER_DATA_PIPELINES (root)
+           - PRICING_RAW_TO_BRONZE_ROOT_TASK (root)
+		   - PRICING_RAW_TO_BRONZE_END_TASK (end)
            - BRZ_INGEST_PRC_BENCHMARK_CSV
            - BRZ_INGEST_PRC_BENCHMARK_LEVEL_CSV
 		   - BRZ_INGEST_PRC_CAMPAIGN_CSV
@@ -31,12 +32,21 @@
            
 ------------------------------------------------------------------------------- */
 
-create or replace task ORCHESTRATION_SCHEMA.PRICING_TRIGGER_DATA_PIPELINES
+create or replace task ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
 	warehouse={{ ENVIRONMENT }}_WH
 	schedule='USING CRON 0 5 * * * UTC'
-	as CALL ORCHESTRATION_SCHEMA.EXECUTE_ALL_TASKS_BRONZE();
+	as EXECUTE NOTEBOOK ORCHESTRATION_SCHEMA.BATCH_LOAD_AZURE_TO_RAW();
 
-ALTER TASK ORCHESTRATION_SCHEMA.PRICING_TRIGGER_DATA_PIPELINES SUSPEND;
+ALTER TASK ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK SUSPEND;
+
+---------------------------------------------------
+--------------------------------------------------------------------------
+---------------------------------------------------
+
+create or replace task ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_END_TASK
+	warehouse={{ ENVIRONMENT }}_WH
+	finalize=ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as SELECT '1';
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -44,11 +54,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.PRICING_TRIGGER_DATA_PIPELINES SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_BENCHMARK_CSV
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"csv_file_format_semicolon\\",  \\"bronze_table\\": \\"PRC_BENCHMARK_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_BENCHMARK_CSV SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_BENCHMARK');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -56,11 +63,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_BENCHMARK_CSV SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_BENCHMARK_LEVEL_CSV
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"csv_file_format_semicolon\\",  \\"bronze_table\\": \\"PRC_BENCHMARK_LEVEL_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_BENCHMARK_LEVEL_CSV SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_BENCHMARK_LEVEL');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -68,11 +72,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_BENCHMARK_LEVEL_CSV SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CAMPAIGN_CSV
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"csv_file_format_semicolon\\",  \\"bronze_table\\": \\"PRC_CAMPAIGN_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CAMPAIGN_CSV SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_CAMPAIGN');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -80,11 +81,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CAMPAIGN_CSV SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CAMPAIGN_MARKET_CSV
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.csv\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"csv_file_format_semicolon\\",  \\"bronze_table\\": \\"PRC_CAMPAIGN_MARKET_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CAMPAIGN_MARKET_CSV SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_CAMPAIGN_MARKET');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -92,11 +90,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CAMPAIGN_MARKET_CSV SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CUSTOMER_ERP_PRICING_MARKET_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_CUSTOMER_ERP_PRICING_MARKET_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CUSTOMER_ERP_PRICING_MARKET_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_CUSTOMER_ERP_PRICING_MARKET');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -104,11 +99,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_CUSTOMER_ERP_PRICING_MARKET_JSON 
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GENERIC_GEOGRAPHY_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_GENERIC_GEOGRAPHY_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GENERIC_GEOGRAPHY_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_GENERIC_GEOGRAPHY');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -116,11 +108,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GENERIC_GEOGRAPHY_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GENERIC_PRODUCT_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_GENERIC_PRODUCT_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GENERIC_PRODUCT_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_GENERIC_PRODUCT');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -128,11 +117,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GENERIC_PRODUCT_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GEOGRAPHY_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_GEOGRAPHY_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GEOGRAPHY_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_GEOGRAPHY');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -140,11 +126,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_GEOGRAPHY_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_HOUSE_PRICE_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_HOUSE_PRICE_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_HOUSE_PRICE_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_HOUSE_PRICE');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -152,11 +135,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_HOUSE_PRICE_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_PRICING_MARKET_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_PRICING_MARKET_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_PRICING_MARKET_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_PRICING_MARKET');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -164,11 +144,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_PRICING_MARKET_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_PRODUCT_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_PRODUCT_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_PRODUCT_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_PRODUCT');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -176,11 +153,8 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_PRODUCT_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_RETAIL_PRICE_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_RETAIL_PRICE_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_RETAIL_PRICE_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_RETAIL_PRICE');
 
 ---------------------------------------------------
 --------------------------------------------------------------------------
@@ -188,8 +162,5 @@ ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_RETAIL_PRICE_JSON SUSPEND;
 
 create or replace task ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_JSON
 	warehouse={{ ENVIRONMENT }}_WH
-	schedule='USING CRON 0 6 * * * UTC'
-	config='{"params":"''{ \\"pattern_file_name\\": \\".*.json\\",  \\"on_error\\": \\"CONTINUE\\", \\"file_format\\" : \\"json_file_format\\",  \\"bronze_table\\": \\"PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_BRZ\\"}''"}'
-	as EXECUTE IMMEDIATE $$ BEGIN LET PARAMS STRING := SYSTEM$GET_TASK_GRAPH_CONFIG('params')::string; EXECUTE NOTEBOOK "ORCHESTRATION_SCHEMA"."INGEST_RAW_FILES_INTO_BRONZE_LAYER"(:PARAMS); END;$$;
-
-ALTER TASK ORCHESTRATION_SCHEMA.BRZ_INGEST_PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET_JSON SUSPEND;
+	after ORCHESTRATION_SCHEMA.PRICING_RAW_TO_BRONZE_ROOT_TASK
+	as CALL ORCHESTRATION_SCHEMA.INGEST_FILE_PROC('PRC_SYRUSMARKET_NON_ERP_PRICING_MARKET');
